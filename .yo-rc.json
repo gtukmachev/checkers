@@ -1,0 +1,43 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "tga.checkers",
+      "nativeLanguage": "en"
+    },
+    "jhipsterVersion": "6.10.4",
+    "applicationType": "monolith",
+    "baseName": "checkers",
+    "packageName": "tga.checkers",
+    "packageFolder": "tga/checkers",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "cacheProvider": "hazelcast",
+    "enableHibernateCache": true,
+    "websocket": false,
+    "databaseType": "sql",
+    "devDatabaseType": "h2Memory",
+    "prodDatabaseType": "postgresql",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "ZTExZGUxOGUxNzFjZDAxNzJhNDRiMWQ0OWJlYTM3MjkwMzFhYzUxOGY4MWQ5MjE0ZTRjYjgxNTA1YTcwYjYyM2UwM2VlNzZhOGZlYzQ0ODg4NjA4NWUyZjQ1MzUzMjkwNjFjNTczYmQ2NGE5MjNmOTM4NjQ0NmY4ZDk1MzQyNjI=",
+    "embeddableLaunchScript": false,
+    "useSass": true,
+    "clientPackageManager": "npm",
+    "clientFramework": "angularX",
+    "clientTheme": "sketchy",
+    "clientThemeVariant": "primary",
+    "creationTimestamp": 1604414088145,
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": true,
+    "nativeLanguage": "en",
+    "languages": ["en", "ru"],
+    "blueprints": []
+  }
+}
