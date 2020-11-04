@@ -31,6 +31,7 @@
   },
   "defaultProject": "checkers",
   "cli": {
-    "packageManager": "npm"
+    "packageManager": "npm",
+    "analytics": "6c01d342-b0a4-4a6c-ab75-a36a15f5acbc"
   }
 }
