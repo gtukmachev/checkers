@@ -47,6 +47,9 @@
       "email.placeholder": "Ваш email"
     },
     "messages": {
+      "goto": {
+        "home": "Перейти на домашнюю страницу"
+      },
       "info": {
         "authenticated": {
           "prefix": "Если вы хотите ",
@@ -134,7 +137,8 @@
     "file": {
       "could.not.extract": "Could not extract file",
       "not.image": "File was expected to be an image but was found to be \"{{ fileType }}\""
-    }
+    },
+    "page-under-construction": "Упс... похоже эта страница ещё в разработке."
   },
   "footer": "Это ваш футтер"
 }

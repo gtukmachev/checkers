@@ -47,6 +47,9 @@
       "email.placeholder": "Your email"
     },
     "messages": {
+      "goto": {
+        "home": "Go to the Home page"
+      },
       "info": {
         "authenticated": {
           "prefix": "If you want to ",
@@ -135,7 +138,8 @@
     "file": {
       "could.not.extract": "Could not extract file",
       "not.image": "File was expected to be an image but was found to be \"{{ fileType }}\""
-    }
+    },
+    "page-under-construction": "Sorry, but the page is under construction yet!"
   },
   "footer": "This is your footer"
 }
