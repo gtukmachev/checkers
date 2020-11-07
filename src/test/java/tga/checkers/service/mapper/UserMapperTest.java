@@ -128,9 +128,11 @@ public class UserMapperTest {
         assertThat(userMapper.userDTOToUser(null)).isNull();
     }
 
+/*
     @Test
     public void testUserFromId() {
         assertThat(userMapper.userFromId(DEFAULT_ID).getId()).isEqualTo(DEFAULT_ID);
         assertThat(userMapper.userFromId(null)).isNull();
     }
+*/
 }
