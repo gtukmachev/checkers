@@ -15,7 +15,7 @@ import javax.annotation.PostConstruct
 
 @SpringBootApplication
 @EnableConfigurationProperties(LiquibaseProperties::class, ApplicationProperties::class)
-class CheckersApp(private val env: Environment) {
+open class CheckersApp(private val env: Environment) {
     /**
      * Initializes checkers.
      *
