@@ -39,10 +39,10 @@ public class StaticResourcesWebConfigurerTest {
         staticResourcesWebConfiguration.addResourceHandlers(resourceHandlerRegistry);
 
         verify(resourceHandlerRegistry, times(1))
-            .addResourceHandler(RESOURCE_PATHS);
+            .addResourceHandler(Companion.getRESOURCE_PATHS());
         verify(staticResourcesWebConfiguration, times(1))
             .initializeResourceHandler(any(ResourceHandlerRegistration.class));
-        for (String testingPath : RESOURCE_PATHS) {
+        for (String testingPath : Companion.getRESOURCE_PATHS()) {
             assertThat(resourceHandlerRegistry.hasMappingForPattern(testingPath)).isTrue();
         }
     }
@@ -51,18 +51,18 @@ public class StaticResourcesWebConfigurerTest {
     public void shouldInitializeResourceHandlerWithCacheControlAndLocations() {
         CacheControl ccExpected = CacheControl.maxAge(5, TimeUnit.DAYS).cachePublic();
         when(staticResourcesWebConfiguration.getCacheControl()).thenReturn(ccExpected);
-        ResourceHandlerRegistration resourceHandlerRegistration = spy(new ResourceHandlerRegistration(RESOURCE_PATHS));
+        ResourceHandlerRegistration resourceHandlerRegistration = spy(new ResourceHandlerRegistration(Companion.getRESOURCE_PATHS()));
 
         staticResourcesWebConfiguration.initializeResourceHandler(resourceHandlerRegistration);
 
         verify(staticResourcesWebConfiguration, times(1)).getCacheControl();
         verify(resourceHandlerRegistration, times(1)).setCacheControl(ccExpected);
-        verify(resourceHandlerRegistration, times(1)).addResourceLocations(RESOURCE_LOCATIONS);
+        verify(resourceHandlerRegistration, times(1)).addResourceLocations(Companion.getRESOURCE_LOCATIONS());
     }
 
 
     @Test
-    public void shoudCreateCacheControlBasedOnJhipsterDefaultProperties() {
+    public void shouldCreateCacheControlBasedOnJhipsterDefaultProperties() {
         CacheControl cacheExpected = CacheControl.maxAge(JHipsterDefaults.Http.Cache.timeToLiveInDays, TimeUnit.DAYS).cachePublic();
         assertThat(staticResourcesWebConfiguration.getCacheControl())
             .extracting(CacheControl::getHeaderValue)
