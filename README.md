@@ -2,6 +2,25 @@
 
 This application was generated using JHipster 6.10.4, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v6.10.4](https://www.jhipster.tech/documentation-archive/v6.10.4).
 
+## How to build in IntelIJ Idea
+
+This project uses Kotlin.
+Spring requires all @Component classes to be "open" (not final).
+
+### Maven
+
+Compilation through maven automatically solves this issue (see "allopen" entries in you pom.xml)
+
+### IntelIJ Idea
+
+To run the project through Idea standard running engine (5 x faster for development),
+You need to configure Kotlin compiler properly:
+
+- open `Menu` -> `File` -> `Settings`
+- type `Kotlin Compiler` in search field
+- open `Kotlin Compiler` tab
+- ???
+
 ## Development
 
 Before you can build this project, you must install and configure the following dependencies on your machine:

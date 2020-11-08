@@ -722,9 +722,7 @@ public class AccountResourceIT {
         user.setResetKey("reset key");
         userRepository.saveAndFlush(user);
 
-        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
-        keyAndPassword.setKey(user.getResetKey());
-        keyAndPassword.setNewPassword("new password");
+        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM(user.getResetKey(), "new password");
 
         restAccountMockMvc.perform(
             post("/api/account/reset-password/finish")
@@ -747,9 +745,7 @@ public class AccountResourceIT {
         user.setResetKey("reset key too small");
         userRepository.saveAndFlush(user);
 
-        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
-        keyAndPassword.setKey(user.getResetKey());
-        keyAndPassword.setNewPassword("foo");
+        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM(user.getResetKey(), "foo");
 
         restAccountMockMvc.perform(
             post("/api/account/reset-password/finish")
@@ -764,9 +760,7 @@ public class AccountResourceIT {
     @Test
     @Transactional
     public void testFinishPasswordResetWrongKey() throws Exception {
-        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM();
-        keyAndPassword.setKey("wrong reset key");
-        keyAndPassword.setNewPassword("new password");
+        KeyAndPasswordVM keyAndPassword = new KeyAndPasswordVM("wrong reset key", "new password");
 
         restAccountMockMvc.perform(
             post("/api/account/reset-password/finish")

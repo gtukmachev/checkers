@@ -15,6 +15,8 @@ import tga.checkers.web.rest.errors.EmailAlreadyUsedException
 import tga.checkers.web.rest.errors.InvalidPasswordException
 import tga.checkers.web.rest.vm.KeyAndPasswordVM
 import tga.checkers.web.rest.vm.ManagedUserVM
+import tga.checkers.web.rest.vm.ManagedUserVM.Companion.PASSWORD_MAX_LENGTH
+import tga.checkers.web.rest.vm.ManagedUserVM.Companion.PASSWORD_MIN_LENGTH
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
@@ -34,8 +36,8 @@ class AccountResource(
     }
 
     companion object {
-        private fun checkPasswordLength(password: String): Boolean {
-            return !StringUtils.isEmpty(password) && password.length >= ManagedUserVM.PASSWORD_MIN_LENGTH && password.length <= ManagedUserVM.PASSWORD_MAX_LENGTH
+        private fun checkPasswordLength(password: String?): Boolean {
+            return !password.isNullOrEmpty() && password.length in (PASSWORD_MIN_LENGTH .. PASSWORD_MAX_LENGTH)
         }
     }
 
@@ -51,11 +53,11 @@ class AccountResource(
      */
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    fun registerAccount(@RequestBody managedUserVM: @Valid ManagedUserVM?) {
-        if (!checkPasswordLength(managedUserVM!!.password)) {
+    fun registerAccount(@RequestBody managedUserVM: @Valid ManagedUserVM) {
+        if (!checkPasswordLength(managedUserVM.password)) {
             throw InvalidPasswordException()
         }
-        val user = userService.registerUser(managedUserVM, managedUserVM.password)
+        val user = userService.registerUser(managedUserVM, managedUserVM.password!!)
         mailService.sendActivationEmail(user)
     }
 
