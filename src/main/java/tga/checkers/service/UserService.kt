@@ -30,16 +30,14 @@ import kotlin.collections.HashSet
  */
 @Service
 @Transactional
-open class UserService(
+class UserService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val authorityRepository: AuthorityRepository,
     private val cacheManager: CacheManager
 ) {
 
-    companion object{
-        private val log = LoggerFactory.getLogger(UserService::class.java)
-    }
+    private val log = LoggerFactory.getLogger(UserService::class.java)
 
     fun activateRegistration(key: String): Optional<User> {
         log.debug("Activating user for activation key {}", key)
@@ -79,7 +77,10 @@ open class UserService(
     }
 
     fun registerUser(userDTO: UserDTO, password: String): User {
-        userRepository.findOneByLogin(userDTO.login.toLowerCase()).ifPresent { existingUser: User ->
+        val login = userDTO.login.toLowerCase()
+        val userOptional = this.userRepository.findOneByLogin(login)
+
+        userOptional.ifPresent{ existingUser: User ->
             val removed = removeNonActivatedUser(existingUser)
             if (!removed) {
                 throw UsernameAlreadyUsedException()
@@ -233,7 +234,7 @@ open class UserService(
     }
 
     @Transactional
-    open fun changePassword(currentClearTextPassword: String, newPassword: String) {
+    fun changePassword(currentClearTextPassword: String, newPassword: String) {
         SecurityUtils.getCurrentUserLogin()
             .flatMap { login: String -> userRepository.findOneByLogin(login) }
             .ifPresent { user: User ->
@@ -249,17 +250,17 @@ open class UserService(
     }
 
     @Transactional(readOnly = true)
-    open fun getAllManagedUsers(pageable: Pageable): Page<UserDTO> {
+    fun getAllManagedUsers(pageable: Pageable): Page<UserDTO> {
         return userRepository.findAllByLoginNot(pageable, Constants.ANONYMOUS_USER).map { user: User -> UserDTO(user) }
     }
 
     @Transactional(readOnly = true)
-    open fun getUserWithAuthoritiesByLogin(login: String): Optional<User> {
+    fun getUserWithAuthoritiesByLogin(login: String): Optional<User> {
         return userRepository.findOneWithAuthoritiesByLogin(login)
     }
 
     @get:Transactional(readOnly = true)
-    open val userWithAuthorities: Optional<User>
+    val userWithAuthorities: Optional<User>
         get() = SecurityUtils.getCurrentUserLogin().flatMap { login: String -> userRepository.findOneWithAuthoritiesByLogin(login) }
 
     /**
@@ -284,7 +285,7 @@ open class UserService(
      * @return a list of all the authorities.
      */
     @get:Transactional(readOnly = true)
-    open val authorities: List<String>
+    val authorities: List<String>
         get() = authorityRepository.findAll().stream().map { obj: Authority -> obj.name }.collect(Collectors.toList())
 
     private fun clearUserCaches(user: User) {

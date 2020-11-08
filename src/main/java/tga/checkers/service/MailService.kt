@@ -22,7 +22,7 @@ import javax.mail.MessagingException
  * We use the [Async] annotation to send emails asynchronously.
  */
 @Service
-open class MailService(
+class MailService(
     private val jHipsterProperties: JHipsterProperties,
     private val javaMailSender: JavaMailSender,
     private val messageSource: MessageSource,
@@ -30,7 +30,7 @@ open class MailService(
 ) {
 
     @Async
-    open fun sendEmail(to: String, subject: String, content: String, isMultipart: Boolean, isHtml: Boolean) {
+    fun sendEmail(to: String, subject: String, content: String, isMultipart: Boolean, isHtml: Boolean) {
         log.debug("Send email[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
             isMultipart, isHtml, to, subject, content)
 
@@ -52,7 +52,7 @@ open class MailService(
     }
 
     @Async
-    open fun sendEmailFromTemplate(user: User, templateName: String, titleKey: String) {
+    fun sendEmailFromTemplate(user: User, templateName: String, titleKey: String) {
         if (user.email == null) {
             log.debug("Email doesn't exist for user '{}'", user.login)
             return
@@ -67,19 +67,19 @@ open class MailService(
     }
 
     @Async
-    open fun sendActivationEmail(user: User) {
+    fun sendActivationEmail(user: User) {
         log.debug("Sending activation email to '{}'", user.email)
         sendEmailFromTemplate(user, "mail/activationEmail", "email.activation.title")
     }
 
     @Async
-    open fun sendCreationEmail(user: User) {
+    fun sendCreationEmail(user: User) {
         log.debug("Sending creation email to '{}'", user.email)
         sendEmailFromTemplate(user, "mail/creationEmail", "email.activation.title")
     }
 
     @Async
-    open fun sendPasswordResetMail(user: User) {
+    fun sendPasswordResetMail(user: User) {
         log.debug("Sending password reset email to '{}'", user.email)
         sendEmailFromTemplate(user, "mail/passwordResetEmail", "email.reset.title")
     }

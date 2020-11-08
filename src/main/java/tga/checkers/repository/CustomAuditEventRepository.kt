@@ -15,8 +15,10 @@ import java.time.Instant
  * An implementation of Spring Boot's [AuditEventRepository].
  */
 @Repository
-open class CustomAuditEventRepository(private val persistenceAuditEventRepository: PersistenceAuditEventRepository,
-                                 private val auditEventConverter: AuditEventConverter) : AuditEventRepository {
+class CustomAuditEventRepository(
+    private val persistenceAuditEventRepository: PersistenceAuditEventRepository,
+    private val auditEventConverter: AuditEventConverter
+) : AuditEventRepository {
     private val log = LoggerFactory.getLogger(javaClass)
     override fun find(principal: String, after: Instant, type: String): List<AuditEvent> {
         val persistentAuditEvents: Iterable<PersistentAuditEvent> = persistenceAuditEventRepository.findByPrincipalAndAuditEventDateAfterAndAuditEventType(principal, after, type)

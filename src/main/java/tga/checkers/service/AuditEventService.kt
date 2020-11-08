@@ -24,10 +24,10 @@ import java.util.function.Consumer
  */
 @Service
 @Transactional
-open class AuditEventService(
-    private val persistenceAuditEventRepository: PersistenceAuditEventRepository,
-    private val auditEventConverter: AuditEventConverter, private val jHipsterProperties: JHipsterProperties) {
-    private val log = LoggerFactory.getLogger(AuditEventService::class.java)
+class AuditEventService(
+    val persistenceAuditEventRepository: PersistenceAuditEventRepository,
+    val auditEventConverter: AuditEventConverter, private val jHipsterProperties: JHipsterProperties) {
+    val log = LoggerFactory.getLogger(AuditEventService::class.java)
 
     /**
      * Old audit events should be automatically deleted after 30 days.
@@ -45,19 +45,19 @@ open class AuditEventService(
     }
 
     @Transactional(readOnly = true)
-    open fun findAll(pageable: Pageable?): Page<AuditEvent> {
+    fun findAll(pageable: Pageable?): Page<AuditEvent> {
         return persistenceAuditEventRepository.findAll(pageable)
             .map { persistentAuditEvent: PersistentAuditEvent? -> auditEventConverter.convertToAuditEvent(persistentAuditEvent!!) }
     }
 
     @Transactional(readOnly = true)
-    open fun findByDates(fromDate: Instant?, toDate: Instant?, pageable: Pageable?): Page<AuditEvent> {
+    fun findByDates(fromDate: Instant?, toDate: Instant?, pageable: Pageable?): Page<AuditEvent> {
         return persistenceAuditEventRepository.findAllByAuditEventDateBetween(fromDate!!, toDate!!, pageable!!)
             .map { persistentAuditEvent: PersistentAuditEvent? -> auditEventConverter.convertToAuditEvent(persistentAuditEvent!!) }
     }
 
     @Transactional(readOnly = true)
-    open fun find(id: Long): Optional<AuditEvent> {
+    fun find(id: Long): Optional<AuditEvent> {
         return persistenceAuditEventRepository.findById(id)
             .map { persistentAuditEvent: PersistentAuditEvent? -> auditEventConverter.convertToAuditEvent(persistentAuditEvent!!) }
     }

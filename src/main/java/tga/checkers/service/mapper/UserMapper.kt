@@ -15,7 +15,7 @@ import kotlin.collections.HashSet
  * support is still in beta, and requires a manual step with an IDE.
  */
 @Service
-open class UserMapper {
+class UserMapper {
     fun userToUserDTO(user: User): UserDTO = UserDTO(user)
 
     fun usersToUserDTOs(users: List<User>): List<UserDTO> = users.map(::userToUserDTO)

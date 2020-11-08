@@ -11,6 +11,7 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
 
+//todo: replace the entity with a List<a enum> or String in User entity
 /**
  * An authority (a security role) used by Spring Security.
  */
