@@ -1,10 +1,9 @@
 package tga.checkers.service.dto
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import tga.checkers.config.Constants
-import tga.checkers.domain.Authority
 import tga.checkers.domain.User
 import java.time.Instant
-import java.util.stream.Collectors
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 import javax.validation.constraints.Pattern
@@ -19,7 +18,7 @@ open class UserDTO(
     var firstName: @Size(max = 50) String? = null,
     var lastName: @Size(max = 50) String? = null,
     var email: @Email @Size(min = 5, max = 254) String = "",
-    var isActivated: Boolean = false,
+    @JsonProperty("activated") var isActivated: Boolean = false,
     var imageUrl: @Size(max = 256) String? = null,
     var langKey: @Size(min = 2, max = 10) String? = null,
     var createdBy: String? = null,
