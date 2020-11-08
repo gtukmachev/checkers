@@ -36,7 +36,7 @@ class PersistentAuditEvent : Serializable {
     @ElementCollection
     @MapKeyColumn(name = "name")
     @Column(name = "value")
-    @CollectionTable(name = "jhi_persistent_audit_evt_data", joinColumns = [JoinColumn(name = "event_id")])
+    @CollectionTable( name = "jhi_persistent_audit_evt_data", joinColumns = [JoinColumn(name = "event_id")])
     var data: Map<String, String> = HashMap()
 
     override fun equals(other: Any?): Boolean {
@@ -49,7 +49,7 @@ class PersistentAuditEvent : Serializable {
     }
 
     override fun hashCode(): Int {
-        return 31
+        return id.hashCode()
     }
 
     override fun toString(): String {

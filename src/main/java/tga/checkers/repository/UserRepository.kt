@@ -26,12 +26,12 @@ interface UserRepository : JpaRepository<User, Long> {
     fun findOneByEmailIgnoreCase(email: String): Optional<User>
     fun findOneByLogin(login: String): Optional<User>
 
-    @EntityGraph(attributePaths = ["authorities"])
-    @Cacheable(cacheNames = [USERS_BY_LOGIN_CACHE])
+    //@EntityGraph(attributePaths = ["authorities"])
+    //@Cacheable(cacheNames = [USERS_BY_LOGIN_CACHE])
     fun findOneWithAuthoritiesByLogin(login: String): Optional<User>
 
-    @EntityGraph(attributePaths = ["authorities"])
-    @Cacheable(cacheNames = [USERS_BY_EMAIL_CACHE])
+    //@EntityGraph(attributePaths = ["authorities"])
+    //@Cacheable(cacheNames = [USERS_BY_EMAIL_CACHE])
     fun findOneWithAuthoritiesByEmailIgnoreCase(email: String): Optional<User>
     fun findAllByLoginNot(pageable: Pageable, login: String): Page<User>
 
