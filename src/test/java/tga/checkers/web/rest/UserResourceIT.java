@@ -6,7 +6,6 @@ import tga.checkers.domain.User;
 import tga.checkers.repository.UserRepository;
 import tga.checkers.security.AuthoritiesConstants;
 import tga.checkers.service.dto.UserDTO;
-import tga.checkers.service.mapper.UserMapper;
 import tga.checkers.web.rest.vm.ManagedUserVM;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,8 +64,7 @@ public class UserResourceIT {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private UserMapper userMapper;
+    private UserMapper userMapper = new UserMapper();
 
     @Autowired
     private EntityManager em;

@@ -1,4 +1,4 @@
-package tga.checkers.service.mapper
+package tga.checkers.web.rest
 
 import org.springframework.stereotype.Service
 import tga.checkers.domain.Authority
@@ -14,7 +14,6 @@ import kotlin.collections.HashSet
  * Normal mappers are generated using MapStruct, this one is hand-coded as MapStruct
  * support is still in beta, and requires a manual step with an IDE.
  */
-@Service
 class UserMapper {
     fun userToUserDTO(user: User): UserDTO = UserDTO(user)
 
