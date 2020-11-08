@@ -38,9 +38,9 @@ class UserMapper {
 
 //    fun userFromId(id: Long): User =  User().apply { this.id = id }
 
-    private fun authoritiesFromStrings(authoritiesAsString: Set<String>): Set<Authority> {
+    private fun authoritiesFromStrings(authoritiesAsString: Set<String>): MutableSet<Authority> {
         return authoritiesAsString.asSequence()
             .map{ st -> Authority().apply{ name = st } }
-            .toSet()
+            .toMutableSet()
     }
 }

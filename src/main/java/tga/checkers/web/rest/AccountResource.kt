@@ -117,7 +117,7 @@ class AccountResource(
         if (!user.isPresent) {
             throw AccountResourceException("User could not be found")
         }
-        userService.updateUser(userDTO.firstName, userDTO.lastName, userDTO.email,
+        userService.updateUser(userDTO.firstName!!, userDTO.lastName!!, userDTO.email,
             userDTO.langKey!!, userDTO.imageUrl!!)
     }
 

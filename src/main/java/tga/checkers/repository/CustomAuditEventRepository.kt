@@ -39,11 +39,12 @@ class CustomAuditEventRepository(
         }
     }
 
+    //todo: remove this method
     /**
      * Truncate event data that might exceed column length.
      */
-    private fun truncate(data: Map<String, String>?): Map<String, String?> {
-        val results: MutableMap<String, String?> = HashMap()
+    private fun truncate(data: Map<String, String>?): Map<String, String> {
+        val results: MutableMap<String, String> = HashMap()
         if (data != null) {
             for (entry in data.entries) {
                 var value = entry.value

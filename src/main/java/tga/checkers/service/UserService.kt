@@ -55,7 +55,7 @@ class UserService(
     fun completePasswordReset(newPassword: String, key: String): Optional<User> {
         log.debug("Reset user password for reset key {}", key)
         return userRepository.findOneByResetKey(key)
-            .filter { user: User -> user.resetDate.isAfter(Instant.now().minusSeconds(86400)) }
+            .filter { user: User -> user.resetDate?.isAfter(Instant.now().minusSeconds(86400)) == true }
             .map { user: User ->
                 user.password = passwordEncoder.encode(newPassword)
                 user.resetKey = null
@@ -171,7 +171,7 @@ class UserService(
 
         userDTO.authorities.stream()
             .map { id: String -> authorityRepository.findById(id) }
-            .filter { obj: Optional<Authority?> -> obj.isPresent }
+            .filter { obj: Optional<Authority?> -> obj.isPresent } //todo - delete this code: we have to throw an exception but not ignore "not true" data
             .map { obj: Optional<Authority?> -> obj.get() }
             .forEach { e: Authority -> managedAuthorities.add(e) }
         clearUserCaches(this)

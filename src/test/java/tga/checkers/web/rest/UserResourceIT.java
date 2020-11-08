@@ -500,7 +500,7 @@ public class UserResourceIT {
         assertThat(user1).isEqualTo(user2);
         user2.setId(2L);
         assertThat(user1).isNotEqualTo(user2);
-        user1.setId(null);
+        user1.setId(0);
         assertThat(user1).isNotEqualTo(user2);
     }
 

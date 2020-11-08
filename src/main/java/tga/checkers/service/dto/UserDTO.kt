@@ -16,8 +16,8 @@ import javax.validation.constraints.Size
 open class UserDTO(
     var id: Long = 0,
     var login: @NotBlank @Pattern(regexp = Constants.LOGIN_REGEX) @Size(min = 1, max = 50) String = "",
-    var firstName: @Size(max = 50) String = "",
-    var lastName: @Size(max = 50) String = "",
+    var firstName: @Size(max = 50) String? = null,
+    var lastName: @Size(max = 50) String? = null,
     var email: @Email @Size(min = 5, max = 254) String = "",
     var isActivated: Boolean = false,
     var imageUrl: @Size(max = 256) String? = null,

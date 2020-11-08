@@ -129,7 +129,7 @@ public class AuditResourceIT {
         assertThat(auditEvent1).isEqualTo(auditEvent2);
         auditEvent2.setId(2L);
         assertThat(auditEvent1).isNotEqualTo(auditEvent2);
-        auditEvent1.setId(null);
+        auditEvent1.setId(0);
         assertThat(auditEvent1).isNotEqualTo(auditEvent2);
     }
 }
