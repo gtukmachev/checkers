@@ -21,12 +21,19 @@ import javax.validation.Valid
  */
 @RestController
 @RequestMapping("/api")
-class UserJWTController(private val tokenProvider: TokenProvider, private val authenticationManagerBuilder: AuthenticationManagerBuilder) {
+class UserJWTController(
+    private val tokenProvider: TokenProvider,
+    private val authenticationManagerBuilder: AuthenticationManagerBuilder
+) {
 
     @PostMapping("/authenticate")
     fun authorize(@RequestBody loginVM: @Valid LoginVM): ResponseEntity<JWTToken> {
         val authenticationToken = UsernamePasswordAuthenticationToken(loginVM.username, loginVM.password)
-        val authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken)
+
+        // todo: catch BadCredentialsException to do not print ot to log and return to user error code without any exception
+        val authentication = authenticationManagerBuilder
+            .getObject()
+            .authenticate(authenticationToken)
 
         SecurityContextHolder.getContext().authentication = authentication
 

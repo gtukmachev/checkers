@@ -108,7 +108,7 @@ class AccountResource(
      */
     @PostMapping("/account")
     fun saveAccount(@RequestBody userDTO: @Valid UserDTO?) {
-        val userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow { AccountResourceException("Current user login not found") }
+        val userLogin = SecurityUtils.currentUserLogin ?: throw AccountResourceException("Current user login not found")
         val existingUser = userRepository.findOneByEmailIgnoreCase(userDTO!!.email)
         if (existingUser.isPresent && !existingUser.get().login.equals(userLogin, ignoreCase = true)) {
             throw EmailAlreadyUsedException()

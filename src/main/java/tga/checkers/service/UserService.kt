@@ -218,9 +218,9 @@ class UserService(
      * @param imageUrl  image URL of user.
      */
     fun updateUser(firstName: String, lastName: String, email: String?, langKey: String, imageUrl: String) {
-        SecurityUtils.getCurrentUserLogin()
-            .flatMap { login: String -> userRepository.findOneByLogin(login) }
-            .ifPresent { user: User ->
+        SecurityUtils.currentUserLogin
+            ?.let { userRepository.findOneByLogin(it) }
+            ?.ifPresent { user: User ->
                 user.firstName = firstName
                 user.lastName = lastName
                 if (email != null) {
@@ -235,9 +235,9 @@ class UserService(
 
     @Transactional
     fun changePassword(currentClearTextPassword: String, newPassword: String) {
-        SecurityUtils.getCurrentUserLogin()
-            .flatMap { login: String -> userRepository.findOneByLogin(login) }
-            .ifPresent { user: User ->
+        SecurityUtils.currentUserLogin
+            ?.let { userRepository.findOneByLogin(it) }
+            ?.ifPresent { user: User ->
                 val currentEncryptedPassword = user.password
                 if (!passwordEncoder.matches(currentClearTextPassword, currentEncryptedPassword)) {
                     throw InvalidPasswordException()
@@ -261,7 +261,7 @@ class UserService(
 
     @get:Transactional(readOnly = true)
     val userWithAuthorities: Optional<User>
-        get() = SecurityUtils.getCurrentUserLogin().flatMap { login: String -> userRepository.findOneWithAuthoritiesByLogin(login) }
+        get() = Optional.ofNullable(SecurityUtils.currentUserLogin).flatMap { login: String -> userRepository.findOneWithAuthoritiesByLogin(login) }
 
     /**
      * Not activated users should be automatically deleted after 3 days.
