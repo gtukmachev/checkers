@@ -1,8 +1,8 @@
 package tga.checkers.web.rest
 
-import org.apache.commons.lang3.StringUtils
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import tga.checkers.domain.User
 import tga.checkers.repository.UserRepository
@@ -30,10 +30,6 @@ class AccountResource(
     var userService: UserService,
     var mailService: MailService
 ) {
-
-    init {
-        val b = 1 + 1
-    }
 
     companion object {
         private fun checkPasswordLength(password: String?): Boolean {
@@ -84,7 +80,7 @@ class AccountResource(
     @GetMapping("/authenticate")
     fun isAuthenticated(request: HttpServletRequest): String {
         log.debug("REST request to check if the current user is authenticated")
-        return request.remoteUser
+        return request.remoteUser ?: "" // todo: check if we can return String? here
     }
 
     /**
@@ -94,6 +90,7 @@ class AccountResource(
      * @throws RuntimeException `500 (Internal Server Error)` if the user couldn't be returned.
      */
     @get:GetMapping("/account")
+    @get:Transactional(readOnly = true)
     val account: UserDTO
         get() = userService.userWithAuthorities
             .map { user: User? -> UserDTO(user!!) }
