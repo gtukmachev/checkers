@@ -28,7 +28,11 @@ import javax.servlet.ServletException
  * Configuration of web application with Servlet 3.0 APIs.
  */
 @Configuration
-class WebConfigurer(private val env: Environment, private val jHipsterProperties: JHipsterProperties) : ServletContextInitializer, WebServerFactoryCustomizer<WebServerFactory> {
+class WebConfigurer(
+    private val env: Environment,
+    private val jHipsterProperties: JHipsterProperties
+) : ServletContextInitializer, WebServerFactoryCustomizer<WebServerFactory> {
+
     private val log = LoggerFactory.getLogger(WebConfigurer::class.java)
 
     @Throws(ServletException::class)

@@ -1,5 +1,10 @@
 package tga.checkers.web.rest;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -8,11 +13,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * Unit tests for the {@link ClientForwardController} REST controller.
@@ -52,6 +52,23 @@ public class ClientForwardControllerTest {
             .andExpect(forwardedUrl("/"));
     }
 
+    @Test
+    public void getWebsocketInfoEndpoint() throws Exception {
+        restMockMvc.perform(get("/websocket/info"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getWebsocketEndpoint() throws Exception {
+        restMockMvc.perform(get("/websocket/tracker/308/sessionId/websocket"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void getWebsocketFallbackEndpoint() throws Exception {
+        restMockMvc.perform(get("/websocket/tracker/308/sessionId/xhr_streaming"))
+            .andExpect(status().isNotFound());
+    }
 
     @RestController
     public static class TestController {

@@ -3,12 +3,13 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { JhiLanguageService } from 'ng-jhipster';
 import { SessionStorageService } from 'ngx-webstorage';
-import { Observable, ReplaySubject, of } from 'rxjs';
-import { shareReplay, tap, catchError } from 'rxjs/operators';
+import { Observable, of, ReplaySubject } from 'rxjs';
+import { catchError, shareReplay, tap } from 'rxjs/operators';
 import { StateStorageService } from 'app/core/auth/state-storage.service';
 
 import { SERVER_API_URL } from 'app/app.constants';
 import { Account } from 'app/core/user/account.model';
+import { TrackerService } from 'app/core/tracker/tracker.service';
 
 @Injectable({ providedIn: 'root' })
 export class AccountService {
@@ -20,6 +21,7 @@ export class AccountService {
     private languageService: JhiLanguageService,
     private sessionStorage: SessionStorageService,
     private http: HttpClient,
+    private trackerService: TrackerService,
     private stateStorageService: StateStorageService,
     private router: Router
   ) {}
@@ -31,6 +33,11 @@ export class AccountService {
   authenticate(identity: Account | null): void {
     this.userIdentity = identity;
     this.authenticationState.next(this.userIdentity);
+    if (identity) {
+      this.trackerService.connect();
+    } else {
+      this.trackerService.disconnect();
+    }
   }
 
   hasAnyAuthority(authorities: string[] | string): boolean {

@@ -31,12 +31,20 @@ class JWTFilter(
 
     private fun resolveToken(request: HttpServletRequest): String? {
         val bearerToken = request.getHeader(AUTHORIZATION_HEADER)
-        return if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            bearerToken.substring(7)
-        } else null
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7)
+        }
+
+        val jwt = request.getParameter(AUTHORIZATION_TOKEN)
+        if (StringUtils.hasText(jwt)) {
+            return jwt
+        }
+
+        return null
     }
 
     companion object {
         const val AUTHORIZATION_HEADER = "Authorization"
+        const val AUTHORIZATION_TOKEN = "access_token"
     }
 }

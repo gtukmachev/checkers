@@ -163,16 +163,18 @@
         <dependency> <artifactId>hibernate-jpamodelgen</artifactId>    <groupId>org.hibernate</groupId> <scope>provided</scope> </dependency>
         <dependency> <artifactId>mapstruct-processor</artifactId>      <groupId>org.mapstruct</groupId> <scope>provided</scope> </dependency>
 
-        <dependency> <artifactId>spring-boot-starter-cache</artifactId>           <groupId>org.springframework.boot</groupId> </dependency>
-        <dependency> <artifactId>spring-boot-loader-tools</artifactId>            <groupId>org.springframework.boot</groupId> </dependency>
-        <dependency> <artifactId>spring-boot-starter-actuator</artifactId>        <groupId>org.springframework.boot</groupId> </dependency>
-        <dependency> <artifactId>spring-boot-starter-aop</artifactId>             <groupId>org.springframework.boot</groupId> </dependency>
-        <dependency> <artifactId>spring-boot-starter-data-jpa</artifactId>        <groupId>org.springframework.boot</groupId> </dependency>
-        <dependency> <artifactId>spring-boot-starter-logging</artifactId>         <groupId>org.springframework.boot</groupId> </dependency>
-        <dependency> <artifactId>spring-boot-starter-mail</artifactId>            <groupId>org.springframework.boot</groupId> </dependency>
-        <dependency> <artifactId>spring-boot-starter-security</artifactId>        <groupId>org.springframework.boot</groupId> </dependency>
-        <dependency> <artifactId>spring-boot-starter-thymeleaf</artifactId>       <groupId>org.springframework.boot</groupId> </dependency>
-        <dependency> <artifactId>spring-boot-starter-web</artifactId>             <groupId>org.springframework.boot</groupId> </dependency>
+        <dependency> <artifactId>spring-boot-starter-cache</artifactId>           <groupId>org.springframework.boot</groupId>     </dependency>
+        <dependency> <artifactId>spring-boot-loader-tools</artifactId>            <groupId>org.springframework.boot</groupId>     </dependency>
+        <dependency> <artifactId>spring-boot-starter-actuator</artifactId>        <groupId>org.springframework.boot</groupId>     </dependency>
+        <dependency> <artifactId>spring-boot-starter-aop</artifactId>             <groupId>org.springframework.boot</groupId>     </dependency>
+        <dependency> <artifactId>spring-boot-starter-data-jpa</artifactId>        <groupId>org.springframework.boot</groupId>     </dependency>
+        <dependency> <artifactId>spring-boot-starter-logging</artifactId>         <groupId>org.springframework.boot</groupId>     </dependency>
+        <dependency> <artifactId>spring-boot-starter-mail</artifactId>            <groupId>org.springframework.boot</groupId>     </dependency>
+        <dependency> <artifactId>spring-boot-starter-security</artifactId>        <groupId>org.springframework.boot</groupId>     </dependency>
+        <dependency> <artifactId>spring-boot-starter-thymeleaf</artifactId>       <groupId>org.springframework.boot</groupId>     </dependency>
+        <dependency> <artifactId>spring-boot-starter-web</artifactId>             <groupId>org.springframework.boot</groupId>     </dependency>
+        <dependency> <artifactId>spring-boot-starter-websocket</artifactId>       <groupId>org.springframework.boot</groupId>     </dependency>
+        <dependency> <artifactId>spring-security-messaging</artifactId>           <groupId>org.springframework.security</groupId> </dependency>
         <dependency> <artifactId>spring-boot-configuration-processor</artifactId> <groupId>org.springframework.boot</groupId> <scope>provided</scope> </dependency>
 
         <dependency> <artifactId>h2</artifactId>                       <groupId>com.h2database</groupId>               <scope>test</scope> </dependency>
