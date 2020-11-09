@@ -21,6 +21,7 @@
     <!-- jhipster-needle-distribution-management -->
 
     <properties>
+        <maven.test.skip>false</maven.test.skip>
         <start-class>tga.checkers.CheckersApp</start-class>
 
         <kotlin.version>1.4.20-RC</kotlin.version>
@@ -52,20 +53,25 @@
         <!-- The spring-boot version should match the one managed by
         https://mvnrepository.com/artifact/io.github.jhipster/jhipster-dependencies/${jhipster-dependencies.version} -->
         <spring-boot.version>2.2.7.RELEASE</spring-boot.version>
+
         <!-- The hibernate version should match the one managed by
         https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies/${spring-boot.version} -->
         <hibernate.version>5.4.15.Final</hibernate.version>
+
         <!-- The javassist version should match the one managed by
         https://mvnrepository.com/artifact/org.hibernate/hibernate-core/${hibernate.version} -->
         <javassist.version>3.24.0-GA</javassist.version>
+
         <!-- The liquibase version should match the one managed by
         https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies/${spring-boot.version} -->
         <liquibase.version>3.9.0</liquibase.version>
+
         <liquibase-hibernate5.version>3.8</liquibase-hibernate5.version>
         <validation-api.version>2.0.1.Final</validation-api.version>
         <jaxb-runtime.version>2.3.3</jaxb-runtime.version>
         <archunit-junit5.version>0.14.1</archunit-junit5.version>
         <mapstruct.version>1.3.1.Final</mapstruct.version>
+
         <!-- Plugin versions -->
         <maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -107,6 +113,12 @@
             <dependency> <artifactId>kotlin-test-common</artifactId>              <groupId>org.jetbrains.kotlin</groupId> <version>${kotlin.version}</version> <scope>test</scope> </dependency>
             <dependency> <artifactId>kotlin-test-annotations-common</artifactId>  <groupId>org.jetbrains.kotlin</groupId> <version>${kotlin.version}</version> <scope>test</scope> </dependency>
 
+            <!-- Inherited version from Spring Boot can't be used because of regressions -->
+            <dependency> <artifactId>liquibase-core</artifactId> <groupId>org.liquibase</groupId> <version>${liquibase.version}</version> </dependency>
+
+            <dependency> <artifactId>archunit-junit5-api</artifactId>    <groupId>com.tngtech.archunit</groupId>  <version>${archunit-junit5.version}</version> <scope>test</scope> </dependency>
+            <dependency> <artifactId>archunit-junit5-engine</artifactId> <groupId>com.tngtech.archunit</groupId>  <version>${archunit-junit5.version}</version> <scope>test</scope> </dependency>
+
             <dependency>
                 <groupId>io.github.jhipster</groupId>
                 <artifactId>jhipster-dependencies</artifactId>
@@ -119,222 +131,74 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency> <artifactId>kotlin-stdlib-jdk8</artifactId>    <groupId>org.jetbrains.kotlin</groupId> </dependency>
-        <dependency> <artifactId>kotlin-reflect</artifactId>        <groupId>org.jetbrains.kotlin</groupId> </dependency>
-        <dependency> <artifactId>kotlin-maven-allopen</artifactId>  <groupId>org.jetbrains.kotlin</groupId> </dependency>
-        <dependency> <artifactId>kotlin-test-junit</artifactId>     <groupId>org.jetbrains.kotlin</groupId> </dependency>
-        <dependency> <artifactId>jackson-module-kotlin</artifactId> <groupId>com.fasterxml.jackson.module</groupId></dependency>
+        <dependency> <artifactId>kotlin-stdlib-jdk8</artifactId>    <groupId>org.jetbrains.kotlin</groupId>         </dependency>
+        <dependency> <artifactId>kotlin-reflect</artifactId>        <groupId>org.jetbrains.kotlin</groupId>         </dependency>
+        <dependency> <artifactId>kotlin-maven-allopen</artifactId>  <groupId>org.jetbrains.kotlin</groupId>         </dependency>
+        <dependency> <artifactId>kotlin-test-junit</artifactId>     <groupId>org.jetbrains.kotlin</groupId>         </dependency>
+        <dependency> <artifactId>jackson-module-kotlin</artifactId> <groupId>com.fasterxml.jackson.module</groupId> </dependency>
 
         <dependency> <artifactId>jhipster-framework</artifactId> <groupId>io.github.jhipster</groupId> </dependency>
 
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
+        <dependency> <artifactId>javax.annotation-api</artifactId> <groupId>javax.annotation</groupId> </dependency>
+
+        <dependency> <artifactId>jackson-module-jaxb-annotations</artifactId> <groupId>com.fasterxml.jackson.module</groupId>   </dependency>
+        <dependency> <artifactId>jackson-datatype-hibernate5</artifactId>     <groupId>com.fasterxml.jackson.datatype</groupId> </dependency>
+        <dependency> <artifactId>jackson-datatype-hppc</artifactId>           <groupId>com.fasterxml.jackson.datatype</groupId> </dependency>
+        <dependency> <artifactId>jackson-datatype-jsr310</artifactId>         <groupId>com.fasterxml.jackson.datatype</groupId> </dependency>
+
+        <dependency> <artifactId>hazelcast</artifactId>                       <groupId>com.hazelcast</groupId> </dependency>
+        <dependency> <artifactId>hazelcast-hibernate53</artifactId>           <groupId>com.hazelcast</groupId> </dependency>
+        <dependency> <artifactId>hazelcast-spring</artifactId>                <groupId>com.hazelcast</groupId> </dependency>
+        <dependency> <artifactId>springfox-swagger2</artifactId>              <groupId>io.springfox</groupId>  </dependency>
+        <dependency> <artifactId>springfox-bean-validators</artifactId>       <groupId>io.springfox</groupId>  </dependency>
+        <dependency> <artifactId>HikariCP</artifactId>                        <groupId>com.zaxxer</groupId>    </dependency>
+
+        <dependency> <artifactId>cache-api</artifactId>                <groupId>javax.cache</groupId>                           </dependency>
+        <dependency> <artifactId>hibernate-core</artifactId>           <groupId>org.hibernate</groupId>                         </dependency>
+        <dependency> <artifactId>hibernate-validator</artifactId>      <groupId>org.hibernate.validator</groupId>               </dependency>
+        <dependency> <artifactId>liquibase-core</artifactId>           <groupId>org.liquibase</groupId>                         </dependency>
+        <dependency> <artifactId>logstash-logback-encoder</artifactId> <groupId>net.logstash.logback</groupId>                  </dependency>
+        <dependency> <artifactId>postgresql</artifactId>               <groupId>org.postgresql</groupId>                        </dependency>
+        <dependency> <artifactId>mapstruct</artifactId>                <groupId>org.mapstruct</groupId>                         </dependency>
+        <dependency> <artifactId>hibernate-jpamodelgen</artifactId>    <groupId>org.hibernate</groupId> <scope>provided</scope> </dependency>
+        <dependency> <artifactId>mapstruct-processor</artifactId>      <groupId>org.mapstruct</groupId> <scope>provided</scope> </dependency>
+
+        <dependency> <artifactId>spring-boot-starter-cache</artifactId>           <groupId>org.springframework.boot</groupId> </dependency>
+        <dependency> <artifactId>spring-boot-loader-tools</artifactId>            <groupId>org.springframework.boot</groupId> </dependency>
+        <dependency> <artifactId>spring-boot-starter-actuator</artifactId>        <groupId>org.springframework.boot</groupId> </dependency>
+        <dependency> <artifactId>spring-boot-starter-aop</artifactId>             <groupId>org.springframework.boot</groupId> </dependency>
+        <dependency> <artifactId>spring-boot-starter-data-jpa</artifactId>        <groupId>org.springframework.boot</groupId> </dependency>
+        <dependency> <artifactId>spring-boot-starter-logging</artifactId>         <groupId>org.springframework.boot</groupId> </dependency>
+        <dependency> <artifactId>spring-boot-starter-mail</artifactId>            <groupId>org.springframework.boot</groupId> </dependency>
+        <dependency> <artifactId>spring-boot-starter-security</artifactId>        <groupId>org.springframework.boot</groupId> </dependency>
+        <dependency> <artifactId>spring-boot-starter-thymeleaf</artifactId>       <groupId>org.springframework.boot</groupId> </dependency>
+        <dependency> <artifactId>spring-boot-starter-web</artifactId>             <groupId>org.springframework.boot</groupId> </dependency>
+        <dependency> <artifactId>spring-boot-configuration-processor</artifactId> <groupId>org.springframework.boot</groupId> <scope>provided</scope> </dependency>
+
+        <dependency> <artifactId>h2</artifactId>                       <groupId>com.h2database</groupId>               <scope>test</scope> </dependency>
+        <dependency> <artifactId>postgresql</artifactId>               <groupId>org.testcontainers</groupId>           <scope>test</scope> </dependency>
+        <dependency> <artifactId>spring-boot-test</artifactId>         <groupId>org.springframework.boot</groupId>     <scope>test</scope> </dependency>
+        <dependency> <artifactId>spring-security-test</artifactId>     <groupId>org.springframework.security</groupId> <scope>test</scope> </dependency>
+        <dependency> <artifactId>archunit-junit5-api</artifactId>      <groupId>com.tngtech.archunit</groupId>         <scope>test</scope> </dependency>
+        <dependency> <artifactId>spring-boot-starter-test</artifactId> <groupId>org.springframework.boot</groupId>     <scope>test</scope>
+            <exclusions> <exclusion> <artifactId>junit-vintage-engine</artifactId> <groupId>org.junit.vintage</groupId> </exclusion> </exclusions>
         </dependency>
 
-        <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-cache</artifactId> </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-jaxb-annotations</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-hibernate5</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-hppc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast-hibernate53</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast-spring</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-bean-validators</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.cache</groupId>
-            <artifactId>cache-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-jpamodelgen</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.hibernate.validator</groupId>
-            <artifactId>hibernate-validator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <!-- Inherited version from Spring Boot can't be used because of regressions -->
-            <version>${liquibase.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct-processor</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-loader-tools</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.junit.vintage</groupId>
-                    <artifactId>junit-vintage-engine</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.tngtech.archunit</groupId>
-            <artifactId>archunit-junit5-api</artifactId>
-            <version>${archunit-junit5.version}</version>
-            <scope>test</scope>
-        </dependency>
         <!-- Adding the engine dependency to the surefire-plugin unfortunately does not work in the current version. -->
         <!-- https://www.archunit.org/userguide/html/000_Index.html#_junit_5 -->
-        <dependency>
-            <groupId>com.tngtech.archunit</groupId>
-            <artifactId>archunit-junit5-engine</artifactId>
-            <version>${archunit-junit5.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.zalando</groupId>
-            <artifactId>problem-spring-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+        <dependency> <artifactId>archunit-junit5-engine</artifactId> <groupId>com.tngtech.archunit</groupId>  <scope>test</scope> </dependency>
+
+        <dependency> <artifactId>problem-spring-web</artifactId>     <groupId>org.zalando</groupId>      </dependency>
+        <dependency> <artifactId>jjwt-api</artifactId>               <groupId>io.jsonwebtoken</groupId>  </dependency>
+        <dependency> <artifactId>jjwt-impl</artifactId>              <groupId>io.jsonwebtoken</groupId>  <scope>runtime</scope> </dependency>
+        <dependency> <artifactId>jjwt-jackson</artifactId>           <groupId>io.jsonwebtoken</groupId>  <scope>runtime</scope> </dependency>
+
         <!-- Spring Cloud -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cloud-connectors</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-data</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
-        </dependency>
-        <!-- jhipster-needle-maven-add-dependency -->
+        <dependency> <artifactId>spring-boot-starter-cloud-connectors</artifactId> <groupId>org.springframework.boot</groupId> </dependency>
+        <dependency> <artifactId>spring-security-data</artifactId>                 <groupId>org.springframework.security</groupId> </dependency>
+        <dependency> <artifactId>micrometer-registry-prometheus</artifactId>       <groupId>io.micrometer</groupId> </dependency>
+        <dependency> <artifactId>metrics-core</artifactId>                         <groupId>io.dropwizard.metrics</groupId> </dependency>
+
     </dependencies>
 
     <build>
