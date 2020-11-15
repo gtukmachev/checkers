@@ -24,7 +24,7 @@
         <maven.test.skip>false</maven.test.skip>
         <start-class>tga.checkers.CheckersApp</start-class>
 
-        <kotlin.version>1.4.20-RC</kotlin.version>
+        <kotlin.version>1.4.10</kotlin.version>
         <kotlin-coroutines.version>1.4.1</kotlin-coroutines.version>
         <jhipster-dependencies.version>3.9.1</jhipster-dependencies.version>
 

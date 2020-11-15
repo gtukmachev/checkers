@@ -7,15 +7,14 @@ import { CheckersCoreModule } from 'app/core/core.module';
 import { CheckersAppRoutingModule } from './app-routing.module';
 import { CheckersHomeModule } from './home/home.module';
 import { CheckersEntityModule } from './entities/entity.module';
-// jhipster-needle-angular-add-module-import JHipster will add new module here
 import { MainComponent } from './layouts/main/main.component';
 import { NavbarComponent } from './layouts/navbar/navbar.component';
 import { FooterComponent } from './layouts/footer/footer.component';
 import { PageRibbonComponent } from './layouts/profiles/page-ribbon.component';
 import { ActiveMenuDirective } from './layouts/navbar/active-menu.directive';
 import { ErrorComponent } from './layouts/error/error.component';
-import { GamePageComponent } from './game/game-page/game-page.component';
 import { GameModule } from 'app/game/game.module';
+import { StompRService } from '@stomp/ng2-stompjs';
 
 @NgModule({
   imports: [
@@ -29,6 +28,7 @@ import { GameModule } from 'app/game/game.module';
     GameModule,
   ],
   declarations: [MainComponent, NavbarComponent, ErrorComponent, PageRibbonComponent, ActiveMenuDirective, FooterComponent],
+  providers: [StompRService],
   bootstrap: [MainComponent],
 })
 export class CheckersAppModule {}

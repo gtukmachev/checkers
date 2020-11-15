@@ -5,7 +5,13 @@
             <a class="alert-link" routerLink="/" jhiTranslate="global.messages.goto.home">Go to the Home page</a>
         </div>
 
-        <button type="button" class="btn btn-outline-primary"><h1 class="display-4" jhiTranslate="game-page.subtitle">...</h1></button>
+        <button type="button" class="btn btn-outline-primary" (click)="startGameRequest()">
+            <h1 class="display-4" jhiTranslate="game-page.subtitle">...</h1>
+        </button>
+
+        <div class="alert alert-info" *ngIf="gameDescriptor != null">
+            {{gameDescriptor | json}}
+        </div>
 
     </div>
 </div>

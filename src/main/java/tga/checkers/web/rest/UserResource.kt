@@ -25,7 +25,6 @@ import tga.checkers.web.rest.errors.LoginAlreadyUsedException
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.*
-import java.util.function.Function
 import javax.validation.Valid
 
 /**
