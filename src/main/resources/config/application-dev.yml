@@ -18,12 +18,13 @@ logging:
     ROOT: DEBUG
     io.github.jhipster: DEBUG
     tga.checkers: DEBUG
+    tga.checkers.config: TRACE
 
 spring:
   profiles:
     active: dev
     include:
-      - swagger
+      # - swagger
       # Uncomment to activate TLS for the dev profile
       #- tls
   devtools:

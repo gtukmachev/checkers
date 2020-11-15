@@ -6,6 +6,7 @@ import { AuthServerProvider } from '../auth/auth-jwt.service';
 import { Location } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { IMessage } from '@stomp/stompjs';
+import { first } from 'rxjs/operators';
 
 type onGameFoundHandler = (gameDescriptor: IFoundGameDescriptor) => void;
 
@@ -28,6 +29,7 @@ export class GameMakerService {
 */
     this.gameWaitingSubscription = this.stompService
       .watch('/user/queue/new-game-request')
+      .pipe(first())
       .subscribe((msg: IMessage) => this.onGameFound(msg, onGameFound));
   }
 

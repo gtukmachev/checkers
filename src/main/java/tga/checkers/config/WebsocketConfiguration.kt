@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.server.ServerHttpRequest
 import org.springframework.http.server.ServerHttpResponse
 import org.springframework.http.server.ServletServerHttpRequest
+import org.springframework.messaging.simp.config.ChannelRegistration
 import org.springframework.messaging.simp.config.MessageBrokerRegistry
 import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -21,7 +22,11 @@ import java.util.*
 
 @Configuration
 @EnableWebSocketMessageBroker
-class WebsocketConfiguration(private val jHipsterProperties: JHipsterProperties) : WebSocketMessageBrokerConfigurer {
+class WebsocketConfiguration(
+    private val jHipsterProperties: JHipsterProperties,
+    private val webSocketInboundChannelInterceptor: WebSocketInboundChannelInterceptor
+
+) : WebSocketMessageBrokerConfigurer {
     override fun configureMessageBroker(config: MessageBrokerRegistry) {
         config.enableSimpleBroker("/topic")
     }
@@ -35,11 +40,20 @@ class WebsocketConfiguration(private val jHipsterProperties: JHipsterProperties)
             .setInterceptors(httpSessionHandshakeInterceptor())
     }
 
+    override fun configureClientInboundChannel(registration: ChannelRegistration) {
+        registration.interceptors(webSocketInboundChannelInterceptor)
+    }
+
     @Bean
     fun httpSessionHandshakeInterceptor(): HandshakeInterceptor {
         return object : HandshakeInterceptor {
+
             @Throws(Exception::class)
-            override fun beforeHandshake(request: ServerHttpRequest, response: ServerHttpResponse, wsHandler: WebSocketHandler, attributes: MutableMap<String, Any>): Boolean {
+            override fun beforeHandshake(request: ServerHttpRequest,
+                                         response: ServerHttpResponse,
+                                         wsHandler: WebSocketHandler,
+                                         attributes: MutableMap<String, Any>): Boolean
+            {
                 if (request is ServletServerHttpRequest) {
                     attributes[IP_ADDRESS] = request.remoteAddress
                 }
@@ -53,20 +67,23 @@ class WebsocketConfiguration(private val jHipsterProperties: JHipsterProperties)
     }
 
     private fun defaultHandshakeHandler(): DefaultHandshakeHandler {
+
         return object : DefaultHandshakeHandler() {
-            override fun determineUser(request: ServerHttpRequest, wsHandler: WebSocketHandler, attributes: Map<String, Any>): Principal {
-                var principal = request.principal
-                if (principal == null) {
-                    val authorities: MutableCollection<SimpleGrantedAuthority> = ArrayList()
-                    authorities.add(SimpleGrantedAuthority(AuthoritiesConstants.ANONYMOUS))
-                    principal = AnonymousAuthenticationToken("WebsocketConfiguration", "anonymous", authorities)
-                }
-                return principal
+            override fun determineUser(
+                request: ServerHttpRequest,
+                wsHandler: WebSocketHandler,
+                attributes: Map<String, Any> ): Principal
+            {
+                return request.principal ?: anonymousAuthenticationPrincipal
             }
         }
+
     }
 
     companion object {
         const val IP_ADDRESS = "IP_ADDRESS"
+        val anonymousAuthorities = listOf(SimpleGrantedAuthority(AuthoritiesConstants.ANONYMOUS))
+        val anonymousAuthenticationPrincipal = AnonymousAuthenticationToken("WebsocketConfiguration", "anonymous", anonymousAuthorities)
     }
 }
+
