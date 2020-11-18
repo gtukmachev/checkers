@@ -35,6 +35,9 @@
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <kotlin.compiler.jvmTarget>${java.version}</kotlin.compiler.jvmTarget>
 
+        <akka.version>2.6.8</akka.version>
+        <scala.binary.version>2.13</scala.binary.version>
+
         <node.version>v12.16.1</node.version>
         <npm.version>6.14.5</npm.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -113,6 +116,10 @@
             <dependency> <artifactId>kotlin-test-common</artifactId>              <groupId>org.jetbrains.kotlin</groupId> <version>${kotlin.version}</version> <scope>test</scope> </dependency>
             <dependency> <artifactId>kotlin-test-annotations-common</artifactId>  <groupId>org.jetbrains.kotlin</groupId> <version>${kotlin.version}</version> <scope>test</scope> </dependency>
 
+            <dependency> <artifactId>akka-actor_${scala.binary.version}</artifactId>   <groupId>com.typesafe.akka</groupId> <version>${akka.version}</version> </dependency>
+            <dependency> <artifactId>akka-slf4j_${scala.binary.version}</artifactId>   <groupId>com.typesafe.akka</groupId> <version>${akka.version}</version> </dependency>
+            <dependency> <artifactId>akka-testkit_${scala.binary.version}</artifactId> <groupId>com.typesafe.akka</groupId> <version>${akka.version}</version> <scope>test</scope> </dependency>
+
             <!-- Inherited version from Spring Boot can't be used because of regressions -->
             <dependency> <artifactId>liquibase-core</artifactId> <groupId>org.liquibase</groupId> <version>${liquibase.version}</version> </dependency>
 
@@ -138,6 +145,10 @@
         <dependency> <artifactId>jackson-module-kotlin</artifactId> <groupId>com.fasterxml.jackson.module</groupId> </dependency>
 
         <dependency> <artifactId>jhipster-framework</artifactId> <groupId>io.github.jhipster</groupId> </dependency>
+
+        <dependency> <artifactId>akka-actor_${scala.binary.version}</artifactId>   <groupId>com.typesafe.akka</groupId> </dependency>
+        <dependency> <artifactId>akka-slf4j_${scala.binary.version}</artifactId>   <groupId>com.typesafe.akka</groupId> </dependency>
+        <dependency> <artifactId>akka-testkit_${scala.binary.version}</artifactId> <groupId>com.typesafe.akka</groupId> <scope>test</scope> </dependency>
 
         <dependency> <artifactId>javax.annotation-api</artifactId> <groupId>javax.annotation</groupId> </dependency>
 
