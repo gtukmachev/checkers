@@ -1,5 +1,5 @@
 export interface IFoundGameDescriptor {
-  gameId: number;
-  color: string;
-  partnerName: string;
+    gameId: number;
+    color: string;
+    partnerName: string;
 }

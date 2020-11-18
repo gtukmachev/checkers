@@ -5,12 +5,23 @@
             <a class="alert-link" routerLink="/" jhiTranslate="global.messages.goto.home">Go to the Home page</a>
         </div>
 
-        <button type="button" class="btn btn-outline-primary" (click)="startGameRequest()">
-            <h1 class="display-4" jhiTranslate="game-page.subtitle">...</h1>
-        </button>
+        <div class="row">
+            <div class="column">
+                <button type="button" class="btn btn-outline-primary" (click)="startGameRequest()">
+                    <h1 class="display-4" jhiTranslate="game-page.subtitle">...</h1>
+                </button>
+            </div>
+            <div class="column">
+                <button type="button" class="btn btn-outline-secondary" (click)="sendStepToServer()">
+                    <h1 class="display-4" jhiTranslate="game-page.sendStep">Step!</h1>
+                </button>
+            </div>
+        </div>
 
-        <div class="alert alert-info" *ngIf="gameDescriptor != null">
-            {{gameDescriptor | json}}
+        <div class="alert alert-info" *ngIf="serverMessages != null">
+            <span *ngFor="let serverMessage of serverMessages">
+                <strong class="pr">{{serverMessage.messageChannel}}</strong>:{{serverMessage.msg | json}}
+            </span>
         </div>
 
     </div>

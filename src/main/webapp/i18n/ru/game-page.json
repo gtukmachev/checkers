@@ -1,6 +1,7 @@
 {
-  "game-page": {
-    "title": "Игра",
-    "subtitle": "В Игру!"
-  }
+    "game-page": {
+        "title": "Игра",
+        "subtitle": "В Игру!",
+        "sendStep": "Ход!"
+    }
 }

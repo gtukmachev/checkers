@@ -35,7 +35,9 @@ open class LoggingAspect(private val env: Environment) {
      */
     @Pointcut("within(tga.checkers.repository..*)" +
         " || within(tga.checkers.service..*)" +
-        " || within(tga.checkers.web.rest..*)")
+        " || within(tga.checkers.web.rest..*)" +
+        " || within(tga.checkers.web.websocket..*)"
+    )
     fun applicationPackagePointcut() {
         // Method is empty as this is just a Pointcut, the implementations are in the advices.
     }

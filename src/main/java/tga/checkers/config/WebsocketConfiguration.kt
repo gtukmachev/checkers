@@ -28,7 +28,8 @@ class WebsocketConfiguration(
 
 ) : WebSocketMessageBrokerConfigurer {
     override fun configureMessageBroker(config: MessageBrokerRegistry) {
-        config.enableSimpleBroker("/topic")
+        config.enableSimpleBroker("/topic", "/queue", "/user")
+//        config.setUserDestinationPrefix("/user/");
     }
 
     override fun registerStompEndpoints(registry: StompEndpointRegistry) {
