@@ -6,7 +6,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import tga.checkers.exts.linkedListOf
 import tga.checkers.exts.on
 import tga.checkers.exts.actorOf
-import tga.checkers.game.model.GameRequest
 import tga.checkers.game.model.Player
 import java.util.*
 
@@ -53,3 +52,7 @@ class GamesMakerActor(
         return listOf( player1, player2 )
     }
 }
+
+data class GameRequest(
+        val player: Player
+)
