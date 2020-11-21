@@ -19,51 +19,20 @@ import java.util.concurrent.atomic.AtomicInteger
 @Controller
 class GameMakerService(
         private val simpMessagingTemplate: SimpMessagingTemplate,
-        private val actorSystem: ActorSystem
+        private val gameMakerActor: ActorRef
 ) {
 
     companion object {
         val log: Logger = LoggerFactory.getLogger(GameMakerService::class.java);
     }
 
-    private val counter = AtomicInteger(0)
-
-    private val waitUser = ConcurrentLinkedQueue<Principal>()
-
-
     @SubscribeMapping("/user/queue/new-game-request")
     fun gameMakeRequest(principal: Principal) {
-        val mainActor = actorSystem.actorSelection("mainActor")
-        val msg = GameRequest( Player(0, principal.name) )
-        mainActor.tell(msg, ActorRef.noSender())
-
-        waitUser.add(principal)
-        tryToStartGame();
-    }
-
-    private fun tryToStartGame() {
-        log.trace("tryToStartGame(): waitUser.size = {}", waitUser.size)
-        if (waitUser.size < 2) return
-
-        val user1: Principal = waitUser.remove()
-        val user2: Principal = waitUser.remove()
-
-        val gameId = counter.incrementAndGet();
-
-        sendNewUserToPlayer(user1, gameId, "white", user2)
-        sendNewUserToPlayer(user2, gameId, "black", user1)
-    }
-
-    private fun sendNewUserToPlayer(player: Principal, gameId: Int, color: String, opponent: Principal) {
-        val foundGameDescriptor = FoundGameDescriptor(gameId, color, opponent.name)
-        val username = player.name
-        simpMessagingTemplate.convertAndSendToUser(username, "/queue/new-game-request", foundGameDescriptor)
+        // todo: pass a real user Id (from DB)
+        // todo: think if it a good idea to pass Principal to Akka level?
+        val msg = GameRequest( Player(userId = 0, name = principal.name, gameRole = "undefined") )
+        gameMakerActor.tell(msg, ActorRef.noSender())
     }
 
 }
 
-data class FoundGameDescriptor(
-    val gameId: Int,
-    val color: String,
-    val partnerName: String
-)
