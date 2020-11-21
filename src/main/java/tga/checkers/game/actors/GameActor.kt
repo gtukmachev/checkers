@@ -13,7 +13,6 @@ import tga.checkers.game.model.Player
 interface GameActorMessage
     class  StartGame: GameActorMessage
     class  FirstTurn: GameActorMessage
-    class PlayerStep: GameActorMessage
 
 
 class GameActor(
@@ -25,6 +24,7 @@ class GameActor(
     lateinit var playerActors: Array<ActorRef>
 
     var activePlayerActor: Int = -1
+    var nTurn: Int = 0
 
     override fun preStart() {
         log().debug("preStart")
@@ -34,7 +34,7 @@ class GameActor(
 
     private fun createPlayerActor(playerIndex: Int, player: Player): ActorRef {
         log().debug("createPlayerActor(playerIndex={}, player={})", playerIndex, player)
-        return context.actorOf("player-${playerIndex}"){ PlayerActor(gameId, player, self, websocket) }
+        return context.actorOf("player-${player.name}"){ PlayerActor(gameId, player, self, websocket) }
     }
 
     override fun createReceive(): Receive = gameStatingBehavior
@@ -60,7 +60,8 @@ class GameActor(
     private fun onFirstTurn() = nextTurn()
 
     private fun nextTurn() {
-        log().debug("nextTurn()")
+        nTurn++
+        log().debug("nextTurn() : {}", nTurn)
 
         switchActivePlayer()
         checkIfCurrentPlayerLooseTheGame()
@@ -75,10 +76,8 @@ class GameActor(
 
     private fun switchActivePlayer() {
         log().debug("switchActivePlayer()")
-        activePlayerActor = when (activePlayerActor) {
-            playerActors.size -> 0
-                         else -> activePlayerActor + 1
-        }
+        activePlayerActor++
+        if (activePlayerActor >= playerActors.size) activePlayerActor = 0
     }
 
     private fun checkIfCurrentPlayerLooseTheGame() {
@@ -90,7 +89,7 @@ class GameActor(
         log().debug("notifyActiveUserAboutHisStep()")
         val playerActor = playerActors[activePlayerActor]
 
-        playerActor.tell(YourStep(), self)
+        playerActor.tell( YourStep(nTurn), self)
     }
 
     private fun onWrongPlayerStep(playerStep: PlayerStep, wrongPlayerActor: ActorRef) {

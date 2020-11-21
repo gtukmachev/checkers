@@ -19,9 +19,9 @@
         </div>
 
         <div class="alert alert-info" *ngIf="serverMessages != null">
-            <span *ngFor="let serverMessage of serverMessages">
-                <strong class="pr">{{serverMessage.messageChannel}}</strong>:{{serverMessage.msg | json}}
-            </span>
+            <div *ngFor="let serverMessage of serverMessages">
+                {{serverMessage.msg | json}}
+            </div>
         </div>
 
     </div>

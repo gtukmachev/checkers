@@ -12,11 +12,11 @@ import tga.checkers.exts.actorOf
 class AkkaConfiguration {
 
     @Bean fun akka(): ActorSystem {
-        return ActorSystem.create("AkkaSystem")
+        return ActorSystem.create("CheckersAkka")
     }
 
     @Bean fun gameMakerActor(akka: ActorSystem, messagingTemplate: SimpMessagingTemplate): ActorRef {
-        return akka.actorOf("gameMaker"){ GamesMakerActor(messagingTemplate) }
+        return akka.actorOf("game-maker"){ GamesMakerActor(messagingTemplate) }
     }
 
 }

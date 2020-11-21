@@ -9,6 +9,10 @@ import tga.checkers.exts.actorOf
 import tga.checkers.game.model.Player
 import java.util.*
 
+interface GamesMakerActorMessages
+    data class GameRequest(val player: Player) : GamesMakerActorMessages
+
+
 //todo: this actor should be a standalone on a cluster!!!
 class GamesMakerActor(
         val websocket: SimpMessagingTemplate
@@ -53,6 +57,3 @@ class GamesMakerActor(
     }
 }
 
-data class GameRequest(
-        val player: Player
-)

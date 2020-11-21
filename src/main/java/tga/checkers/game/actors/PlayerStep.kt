@@ -10,15 +10,18 @@ import tga.checkers.game.model.Player
 
 interface PlayerActorMessage
     class   GameHasBeenStarted : PlayerActorMessage
-    class             YourStep : PlayerActorMessage
-    class ItIsNotYourStepError : PlayerActorMessage
-    class            GameState : PlayerActorMessage
+
+interface ToPlayerMessage
+    class             YourStep(val nTurn: Int) : ToPlayerMessage
+    class ItIsNotYourStepError                 : ToPlayerMessage
+    class            GameState                 : ToPlayerMessage
 
 interface WebServiceOutcomeMessage
     data class GameDescriptor(val gameId: Int, val color: String                ): WebServiceOutcomeMessage
     data class    GameMessage(val gameId: Int, val msgType: String, val msg: Any): WebServiceOutcomeMessage
 
 interface WebServiceIncomeMessage
+    data class PlayerStep(val lin: Int, val col: Int) : WebServiceIncomeMessage
 
 
 class PlayerActor(
@@ -29,10 +32,9 @@ class PlayerActor(
 ) : AbstractLoggingActor()  {
 
     override fun createReceive(): Receive = ReceiveBuilder()
-            .on(  GameHasBeenStarted::class){ onGameHasBeenStarted()     }
-            .on(            YourStep::class){ onYourStep(it)             }
-            .on(ItIsNotYourStepError::class){ onItIsNotYourStepError(it) }
-            .on(           GameState::class){ onGameState(it)            }
+            .on(      GameHasBeenStarted::class){ onGameHasBeenStarted() }
+            .on(         ToPlayerMessage::class){ tellToUser(it)           }
+            .on( WebServiceIncomeMessage::class){ tellToGame(it)           }
             .build()
 
     private fun onGameHasBeenStarted() {
@@ -40,31 +42,20 @@ class PlayerActor(
         sendToUser(GameDescriptor(gameId, player.gameRole), "/queue/new-game-request")
     }
 
-    private fun onYourStep(yourStepMessage: YourStep) {
-        log().debug("onYourStep")
-        tellUser( yourStepMessage )
-    }
-
-    private fun onItIsNotYourStepError(itIsNotYourStepError: ItIsNotYourStepError) {
-        log().debug("onItIsNotYourStepError(msg={})", itIsNotYourStepError)
-        tellUser( itIsNotYourStepError )
-        //TODO("Not yet implemented")
-    }
-
-    private fun onGameState(gameState: GameState) {
-        log().debug("onGameState(msg={})", gameState)
-        tellUser( gameState )
-        TODO("Not yet implemented")
-    }
-
-    private fun tellUser(msg: Any) {
-        log().debug("tellUser(msg={})",  msg)
+    private fun tellToUser(msg: Any) {
+        log().debug("tellToUser(msg={})",  msg)
         val webSocketMessage = GameMessage(gameId, msg.javaClass.simpleName, msg)
         sendToUser(webSocketMessage, "/queue/game/$gameId")
+    }
+
+    private fun tellToGame(msg: WebServiceIncomeMessage) {
+        log().debug("tellToGame(msg={})",  msg)
+        gameActor.tell(msg, self)
     }
 
     private fun sendToUser(msg: Any, queue: String) {
         log().debug("sendToUser(queue='{}', msg={})", queue, msg)
         websocket.convertAndSendToUser(player.name, queue, msg)
     }
+
 }
