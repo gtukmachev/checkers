@@ -20,7 +20,6 @@ import java.util.concurrent.TimeUnit
 
 @Controller
 class GameWebService(
-        private val simpMessagingTemplate: SimpMessagingTemplate,
         private val akka: ActorSystem,
         private val gameMakerActor: ActorRef
 ) {
