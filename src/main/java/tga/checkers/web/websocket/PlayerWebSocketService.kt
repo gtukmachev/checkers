@@ -19,14 +19,14 @@ import java.security.Principal
 import java.util.concurrent.TimeUnit
 
 @Controller
-class GameMakerService(
+class GameWebService(
         private val simpMessagingTemplate: SimpMessagingTemplate,
         private val akka: ActorSystem,
         private val gameMakerActor: ActorRef
 ) {
 
     companion object {
-        val log: Logger = LoggerFactory.getLogger(GameMakerService::class.java);
+        val log: Logger = LoggerFactory.getLogger(GameWebService::class.java);
     }
 
     @SubscribeMapping("/user/queue/new-game-request")
