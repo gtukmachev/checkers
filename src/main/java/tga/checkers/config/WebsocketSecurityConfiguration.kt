@@ -1,10 +1,8 @@
 package tga.checkers.config
 
 import org.springframework.context.annotation.Configuration
-import org.springframework.messaging.simp.SimpMessageType
 import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry
 import org.springframework.security.config.annotation.web.socket.AbstractSecurityWebSocketMessageBrokerConfigurer
-import tga.checkers.security.AuthoritiesConstants
 
 @Configuration
 class WebsocketSecurityConfiguration : AbstractSecurityWebSocketMessageBrokerConfigurer() {
@@ -16,7 +14,7 @@ class WebsocketSecurityConfiguration : AbstractSecurityWebSocketMessageBrokerCon
 //            .nullDestMatcher().authenticated()
 //            .simpDestMatchers("/topic/tracker").hasAuthority(AuthoritiesConstants.ADMIN) // matches any destination that starts with /topic/
 //            .simpDestMatchers("/topic/tracker").hasAuthority(AuthoritiesConstants.ADMIN) // matches any destination that starts with /topic/
-//            .simpSubscribeDestMatchers("/user/queue/new-game-request").hasAuthority(AuthoritiesConstants.USER)
+//            .simpSubscribeDestMatchers("/user/queue/new-game").hasAuthority(AuthoritiesConstants.USER)
 //
 //            // (i.e. cannot send messages directly to /topic/)
 //            // (i.e. cannot subscribe to /topic/messages/* to get messages sent to

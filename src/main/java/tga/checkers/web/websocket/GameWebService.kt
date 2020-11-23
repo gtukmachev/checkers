@@ -5,16 +5,14 @@ import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
-import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.messaging.simp.annotation.SubscribeMapping
 import org.springframework.stereotype.Controller
 import tga.checkers.exts.sec
 import tga.checkers.game.actors.GameRequest
 import tga.checkers.game.actors.PlayerStep
-import tga.checkers.game.model.Player
+import tga.checkers.game.actors.StatusRequest
 import java.security.Principal
 import java.util.concurrent.TimeUnit
 
@@ -28,28 +26,43 @@ class GameWebService(
         val log: Logger = LoggerFactory.getLogger(GameWebService::class.java);
     }
 
-    @SubscribeMapping("/user/queue/new-game-request")
+    /**
+     * __/user/queue/game__ - the main game channel for players
+     * On SUBSCRIPTION : user will receive a GameStatus message
+     */
+    @SubscribeMapping("/user/queue/game")
+    fun connectToGameChannel(principal: Principal) {
+        gameMakerActor.tell( StatusRequest(principal.name), ActorRef.noSender() )
+    }
+
+
+    /**
+     * Request to start a new game.
+     * Response will be sent to "/user/queue/game" channel to all players (after the game will be created)
+     */
+    @MessageMapping("/queue/new-game")
     fun gameMakeRequest(principal: Principal) {
-        // todo: pass a real user Id (from DB)
-        // todo: think if it a good idea to pass Principal to Akka level?
-        val msg = GameRequest( Player(userId = 0, name = principal.name, gameRole = "undefined") )
+        val msg = GameRequest( principal.name )
         gameMakerActor.tell(msg, ActorRef.noSender())
     }
 
-    @MessageMapping("/queue/game/{gameId}/step")
-    fun fromPlayer(
-                                           principal  : Principal,
-            @DestinationVariable("gameId") gameId     : Int,
-            @Payload                       playerStep : PlayerStep
+
+    /**
+     * A message from a player about his step in his game
+     */
+    @MessageMapping("/queue/steps")
+    fun stepFromPlayer(
+                     principal: Principal,
+            @Payload      step: PlayerStep
     ) {
-        log.debug("fromPlayer(gameId={})", gameId)
-        val playerActor = findPlayerActor(gameId, principal.name)
-        playerActor?.tell(playerStep, ActorRef.noSender())
+        log.debug("fromPlayer(principal={})", principal.name, step)
+        val playerActor = findPlayerActor(principal.name)
+        playerActor?.tell(step, ActorRef.noSender())
     }
 
 
-    fun findPlayerActor(gameId: Int, playerName: String): ActorRef? {
-        val actorName = "/user/game-maker/game-$gameId/player-$playerName"
+    private fun findPlayerActor(playerName: String): ActorRef? {
+        val actorName = "/user/game-maker/player-$playerName"
         return try {
             akka
                 .actorSelection(actorName)

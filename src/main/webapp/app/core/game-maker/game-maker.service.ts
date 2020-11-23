@@ -30,7 +30,7 @@ export class GameMakerService {
      */
     findGame(onGameFound: OnGameFoundHandler, onGameMessage: OnGameMessageHandler) {
         this.getConnectedStompService()
-            .watch('/user/queue/new-game-request')
+            .watch('/user/queue/new-game')
             .pipe(first())
             .subscribe((msg: IMessage) => this.gameIsReady(msg, onGameFound, onGameMessage));
     }
