@@ -16,9 +16,6 @@ interface PlayerIndexItem
         object WaitingIndexItem : PlayerIndexItem
     data class InGameIndexItem(val gameActor: ActorRef) : PlayerIndexItem
 
-interface MessagesToUser
-    object WaitingForAGame : MessagesToUser
-
 
 //todo: this actor should be a standalone on a cluster!!!
 class GamesMakerActor(
@@ -99,6 +96,8 @@ class GamesMakerActor(
 
         val inGameIndexItem = InGameIndexItem(gameActor)
         playerNames.forEach{ playersToGameIndex[it] = inGameIndexItem }
+
+        tellAfter(1.sec(), gameActor){ StartGame() }
     }
 
     private fun findPlayersForNewGame(): Collection<String>? {

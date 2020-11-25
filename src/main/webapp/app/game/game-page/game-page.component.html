@@ -18,10 +18,11 @@
             </div>
         </div>
 
-        <div class="alert alert-info" *ngIf="serverMessages != null">
-            <div *ngFor="let serverMessage of serverMessages">
-                {{serverMessage.msg | json}}
-            </div>
+        <div class="alert alert-info">
+            <h4>Income messages:</h4>
+            <ul>
+                <li *ngFor="let msg of incomeMessages">{{msg.constructor.name}}: {{msg | json}}</li>
+            </ul>
         </div>
 
     </div>

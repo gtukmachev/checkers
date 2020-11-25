@@ -1,8 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameMakerService } from 'app/core/game-maker/game-maker.service';
-import { IFoundGameDescriptor } from 'app/core/game-maker/IFoundGameDescriptor';
-import { IServerMessage } from 'app/game/game-page/IServerMessage';
-import { IGameMessage } from 'app/core/game-maker/IGameMessage';
+import { ToPlayerMessage } from 'app/core/game-maker/GameMessages';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'jhi-game-page',
@@ -10,53 +9,40 @@ import { IGameMessage } from 'app/core/game-maker/IGameMessage';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent implements OnInit, OnDestroy {
-    gameDescriptor: IFoundGameDescriptor | null = null;
-    serverMessages: IServerMessage[] | null = null;
+    incomeMessages: ToPlayerMessage[] = [];
     counter: number = 0;
+
+    private gameSubscription?: Subscription;
 
     constructor(private gameMakerService: GameMakerService) {}
 
-    ngOnInit(): void {}
+    ngOnInit(): void {
+        this.gameSubscription = this.gameMakerService.userGameChannel.subscribe((msg: ToPlayerMessage) => this.onToPlayerMessage(msg));
+    }
 
     ngOnDestroy(): void {
-        if (this.gameDescriptor) {
-            this.gameMakerService.unsubscribeFromGameIfAny(this.gameDescriptor);
-        }
+        this.gameSubscription?.unsubscribe();
+    }
+
+    private onToPlayerMessage(msg: ToPlayerMessage) {
+        this.incomeMessages.push(msg);
+
+        // switch (true) {
+        //     case msg instanceof GameStatus: onGameStatus(msg as GameStatus); break;
+        //     case msg instanceof YourStep  : onYourTurn  (msg as YourTurn  ); break;
+        // }
     }
 
     startGameRequest() {
-        this.gameMakerService.findGame(
-            e => this.onGameFound(e),
-            e => this.onGameMessage(e)
-        );
-    }
-
-    onGameFound(gameDescriptor: IFoundGameDescriptor) {
-        this.gameDescriptor = gameDescriptor;
-        console.log('Game found: ', this.gameDescriptor);
-        this.serverMessages = [
-            {
-                messageChannel: '/user/queue/new-game-request',
-                msg: this.gameDescriptor,
-            },
-        ];
-    }
-
-    onGameMessage(gameMessage: IGameMessage) {
-        this.serverMessages?.push({
-            messageChannel: `/user/queue/game/${this.gameDescriptor?.gameId}`,
-            msg: gameMessage,
-        });
+        this.gameMakerService.findGame();
     }
 
     sendStepToServer() {
-        if (this.gameDescriptor) {
-            this.counter += 1;
-            const step = {
-                lin: this.counter,
-                col: this.counter,
-            };
-            this.gameMakerService.sendStep(this.gameDescriptor.gameId, step);
-        }
+        this.counter += 1;
+        const step = {
+            lin: this.counter,
+            col: this.counter,
+        };
+        this.gameMakerService.sendStep(step);
     }
 }

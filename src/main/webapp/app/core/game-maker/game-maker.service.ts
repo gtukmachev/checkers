@@ -1,38 +1,40 @@
 import { Injectable } from '@angular/core';
 import { StompRService } from '@stomp/ng2-stompjs';
-import { IFoundGameDescriptor } from './IFoundGameDescriptor';
 import * as SockJS from 'sockjs-client';
 import { AuthServerProvider } from '../auth/auth-jwt.service';
 import { Location } from '@angular/common';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
 import { IMessage } from '@stomp/stompjs';
-import { first, map } from 'rxjs/operators';
-import { IGameMessage } from 'app/core/game-maker/IGameMessage';
+import { map } from 'rxjs/operators';
+import { GameMessage, ToPlayerMessage } from 'app/core/game-maker/GameMessages';
 import { IStep } from 'app/core/game-maker/IStep';
-
-type OnGameFoundHandler = (gameDescriptor: IFoundGameDescriptor) => void;
-type OnGameMessageHandler = (gameMessage: IGameMessage) => void;
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameMakerService {
-    constructor(private stompService: StompRService, private authServerProvider: AuthServerProvider, private location: Location) {}
-
-    private gameDescriptor: IFoundGameDescriptor | null = null;
-    private gameChannelSubscription: Subscription | null = null;
+    constructor(private stompService: StompRService, private authServerProvider: AuthServerProvider, private location: Location) {
+        //this.subscribeToUserGameChannel();
+    }
 
     /**
-     * Connection to a new game
+     * Connection to a new game (a new game request from the current user)
      *
-     * @param onGameFound - callback. will be invoked only once - on connection to a game.
-     * @param onGameMessage - callback. Will be called on each message from the game server, such a new step request.
+     * Before call this method, you have to subscribe to answers queue, using the userGameChannel property of this service:
+     * gameMakerService.userGameChannel.subscribe( (msg: ToPlayerMessage) => this.onToPlayerMessage(msg) )
+     *
+     * Example of the message handler function:
+     *
+     * private onToPlayerMessage(msg: ToPlayerMessage) {
+     *    switch (true) {
+     *        case msg instanceof GameStatus: onGameStatus(msg as GameStatus); break;
+     *        case msg instanceof YourTurn  : onYourTurn  (msg as YourTurn  ); break;
+     *    }
+     * }
+     *
      */
-    findGame(onGameFound: OnGameFoundHandler, onGameMessage: OnGameMessageHandler) {
-        this.getConnectedStompService()
-            .watch('/user/queue/new-game')
-            .pipe(first())
-            .subscribe((msg: IMessage) => this.gameIsReady(msg, onGameFound, onGameMessage));
+    findGame() {
+        this.getConnectedStompService().publish('/queue/new-game');
     }
 
     /**
@@ -40,30 +42,19 @@ export class GameMakerService {
      * @param gameId: number
      * @param step: IStep
      */
-    sendStep(gameId: number, step: IStep) {
+    sendStep(step: IStep) {
         const msg = JSON.stringify(step);
-        this.getConnectedStompService().publish(`/queue/game/${gameId}/step`, msg);
+        this.getConnectedStompService().publish(`/queue/game`, msg);
     }
 
-    unsubscribeFromGameIfAny(game: IFoundGameDescriptor) {
-        if (game && this.gameChannelSubscription) {
-            this.gameChannelSubscription.unsubscribe();
-            this.gameChannelSubscription = null;
+    private _userGameChannel: Observable<ToPlayerMessage> | null = null;
+    get userGameChannel(): Observable<ToPlayerMessage> {
+        if (this._userGameChannel == null) {
+            this._userGameChannel = this.getConnectedStompService()
+                .watch('/user/queue/game')
+                .pipe(map<IMessage, ToPlayerMessage>((msg: IMessage) => GameMessage.of(msg.body).msg));
         }
-    }
-
-    private gameIsReady(msg: IMessage, onGameFound: OnGameFoundHandler, onGameMessage: OnGameMessageHandler) {
-        this.gameDescriptor = JSON.parse(msg.body) as IFoundGameDescriptor;
-
-        onGameFound(this.gameDescriptor);
-
-        this.gameChannelSubscription = this.getGameUserChannel(this.gameDescriptor.gameId).subscribe(onGameMessage);
-    }
-
-    private getGameUserChannel(gameId: number): Observable<IGameMessage> {
-        return this.getConnectedStompService()
-            .watch(`/user/queue/game/${gameId}`)
-            .pipe(map<IMessage, IGameMessage>((msg: IMessage) => JSON.parse(msg.body) as IGameMessage));
+        return this._userGameChannel;
     }
 
     private buildWebSocketUrl(): string {

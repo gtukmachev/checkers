@@ -17,11 +17,11 @@ interface ToPlayerMessage
             val gameId: Int,
             val players: Collection<String>,
             val activePlayer: String
-    ) : MessagesToUser
+    ) : ToPlayerMessage
+    object WaitingForAGame : ToPlayerMessage
 
 interface WebServiceOutcomeMessage
-    data class GameDescriptor(val gameId: Int, val color: Int                   ): WebServiceOutcomeMessage
-    data class    GameMessage(val gameId: Int, val msgType: String, val msg: Any): WebServiceOutcomeMessage
+    data class GameMessage(val gameId: Int, val msgType: String, val msg: ToPlayerMessage): WebServiceOutcomeMessage
 
 interface WebServiceIncomeMessage
     data class PlayerStep(val lin: Int, val col: Int) : WebServiceIncomeMessage
@@ -46,7 +46,7 @@ class PlayerActor(
         gameActor = joinToGameMsg.gameActor
     }
 
-    private fun tellToUser(msg: Any) {
+    private fun tellToUser(msg: ToPlayerMessage) {
         log().debug("tellToUser(msg={})",  msg)
         val webSocketMessage = GameMessage(gameId, msg.javaClass.simpleName, msg)
         sendToUser(webSocketMessage, "/queue/game")

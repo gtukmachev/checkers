@@ -7,7 +7,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import tga.checkers.exts.CycleList
 import tga.checkers.exts.on
 import tga.checkers.exts.sec
-import tga.checkers.exts.tellAfter
+import tga.checkers.exts.tellToSelfAfter
 
 interface GameActorMessage
          class StartGame: GameActorMessage
@@ -60,7 +60,7 @@ class GameActor(
         log().debug("onStartGame")
         playersCycle.forEach( ::sendGameStatusToPlayer )
 
-        tellAfter( 1.sec() ){ FirstTurn() }
+        tellToSelfAfter( 1.sec() ){ FirstTurn() }
     }
 
     private fun sendGameStatusToPlayer(pl: Player) {
