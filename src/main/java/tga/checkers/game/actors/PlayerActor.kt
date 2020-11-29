@@ -10,27 +10,11 @@ import tga.checkers.exts.on
 interface PlayerActorMessage
     class JoinToGame(val gameActor: ActorRef): PlayerActorMessage
 
-interface ToPlayerMessage
-    data class             YourStep(val nTurn: Int) : ToPlayerMessage
-         class ItIsNotYourStepError                 : ToPlayerMessage
-    data class GameStatus(
-            val gameId: Int,
-            val players: Collection<String>,
-            val activePlayer: String
-    ) : ToPlayerMessage
-    object WaitingForAGame : ToPlayerMessage
-
-interface WebServiceOutcomeMessage
-    data class GameMessage(val gameId: Int, val msgType: String, val msg: ToPlayerMessage): WebServiceOutcomeMessage
-
-interface WebServiceIncomeMessage
-    data class PlayerStep(val lin: Int, val col: Int) : WebServiceIncomeMessage
-
 
 class PlayerActor(
         private val gameId: Int,
         private val playerName: String,
-        private val playerNum: Int,
+        private val playerIndex: Int,
         private val websocket: SimpMessagingTemplate
 ) : AbstractLoggingActor()  {
 
@@ -48,7 +32,7 @@ class PlayerActor(
 
     private fun tellToUser(msg: ToPlayerMessage) {
         log().debug("tellToUser(msg={})",  msg)
-        val webSocketMessage = GameMessage(gameId, msg.javaClass.simpleName, msg)
+        val webSocketMessage = WebServiceOutcomeMessage(gameId, msg.javaClass.simpleName, msg)
         sendToUser(webSocketMessage, "/queue/game")
     }
 

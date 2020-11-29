@@ -2,6 +2,7 @@
     "game-page": {
         "title": "Игра",
         "subtitle": "В Игру!",
-        "sendStep": "Ход!"
+        "sendStep": "Ход!",
+        "clear": "Очистить"
     }
 }

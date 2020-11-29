@@ -1,6 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameMakerService } from 'app/core/game-maker/game-maker.service';
-import { ToPlayerMessage } from 'app/core/game-maker/GameMessages';
+import {
+    ClassCastException,
+    GameInfo,
+    GameMessage,
+    GameStatus,
+    ItIsNotYourStepError,
+    WaitingForAGame,
+} from 'app/core/game-maker/GameMessages';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -9,7 +16,7 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent implements OnInit, OnDestroy {
-    incomeMessages: ToPlayerMessage[] = [];
+    incomeMessages: GameMessage[] = [];
     counter: number = 0;
 
     private gameSubscription?: Subscription;
@@ -17,21 +24,42 @@ export class GamePageComponent implements OnInit, OnDestroy {
     constructor(private gameMakerService: GameMakerService) {}
 
     ngOnInit(): void {
-        this.gameSubscription = this.gameMakerService.userGameChannel.subscribe((msg: ToPlayerMessage) => this.onToPlayerMessage(msg));
+        this.gameSubscription = this.gameMakerService.userGameChannel.subscribe((msg: GameMessage) => this.onGameMessage(msg));
     }
 
     ngOnDestroy(): void {
         this.gameSubscription?.unsubscribe();
     }
 
-    private onToPlayerMessage(msg: ToPlayerMessage) {
+    private onGameMessage(msg: GameMessage) {
         this.incomeMessages.push(msg);
-
-        // switch (true) {
-        //     case msg instanceof GameStatus: onGameStatus(msg as GameStatus); break;
-        //     case msg instanceof YourStep  : onYourTurn  (msg as YourTurn  ); break;
-        // }
+        switch (msg.msgType) {
+            case 'GameStatus':
+                this.onMsg_GameStatus(msg.msg as GameStatus);
+                break;
+            case 'ItIsNotYourStepError':
+                this.onMsg_ItIsNotYourStepError(msg.msg as ItIsNotYourStepError);
+                break;
+            case 'WaitingForAGame':
+                this.onMsg_WaitingForAGame(msg.msg as WaitingForAGame);
+                break;
+            case 'GameInfo':
+                this.onMsg_GameInfo(msg.msg as GameInfo);
+                break;
+            default:
+                throw new ClassCastException(
+                    `Type of inner object ${msg.msgType} is unrecognized! Supported types are: [GameStatus, ItIsNotYourStepError, WaitingForAGame, GameInfo]`
+                );
+        }
     }
+
+    private onMsg_GameStatus(gameStatus: GameStatus) {}
+
+    private onMsg_ItIsNotYourStepError(itIsNotYourStepError: ItIsNotYourStepError) {}
+
+    private onMsg_WaitingForAGame(waitingForAGame: WaitingForAGame) {}
+
+    private onMsg_GameInfo(gameInfo: GameInfo) {}
 
     startGameRequest() {
         this.gameMakerService.findGame();
@@ -44,5 +72,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
             col: this.counter,
         };
         this.gameMakerService.sendStep(step);
+    }
+
+    clearLog() {
+        this.incomeMessages = [];
     }
 }

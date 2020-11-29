@@ -1,62 +1,76 @@
-export class ToPlayerMessage {
-    static of(subclassShortName: string, obj: any) {
-        switch (subclassShortName) {
-            case 'GameStatus':
-                return new GameStatus(obj.gameId, obj.players, obj.activePlayer);
-            case 'YourStep':
-                return new YourStep(obj.nTurn);
-            case 'ItIsNotYourStepError':
-                return new ItIsNotYourStepError();
-            case 'WaitingForAGame':
-                return new WaitingForAGame();
-            default:
-                throw new ClassCastException(
-                    'Type of inner object is unrecognized! Supported types are: [GameStatus, YourStep, ItIsNotYourStepError, WaitingForAGame]'
-                );
-        }
-    }
-}
-export class GameStatus extends ToPlayerMessage {
-    constructor(readonly gameId: number, readonly players: string[], readonly activePlayer: string) {
-        super();
-    }
-}
-export class YourStep extends ToPlayerMessage {
-    constructor(readonly nTurn: number) {
-        super();
-    }
-}
-export class ItIsNotYourStepError extends ToPlayerMessage {
-    constructor() {
-        super();
-    }
-}
-export class WaitingForAGame extends ToPlayerMessage {
-    constructor() {
-        super();
-    }
+export class ClassCastException {
+    constructor(readonly message: string) {}
 }
 
-interface GameMessages {
+export interface GameMessage {
     readonly gameId: number;
     readonly msgType: string;
-    readonly msg: any;
+    readonly msg: GameInfo | GameStatus | ItIsNotYourStepError | WaitingForAGame;
 }
 
-export class ClassCastException {
-    constructor(readonly message: string, readonly cause: any | null = null) {}
+export enum FigureType {
+    STONE,
+    QUINN,
+}
+export enum FigureColor {
+    BLACK,
+    WHITE,
+}
+export enum MoveStatus {
+    EMPTY,
+    OK,
+    ERROR,
 }
 
-export class GameMessage {
-    static of(jsonString: string): GameMessage {
-        const o = JSON.parse(jsonString) as GameMessages;
+export interface ItIsNotYourStepError {}
 
-        try {
-            return new GameMessage(o.gameId, o.msgType, ToPlayerMessage.of(o.msgType, o.msg));
-        } catch (er) {
-            throw new ClassCastException(`Can't build a GameMessage object from the json: ${jsonString}`, er);
-        }
-    }
+export interface WaitingForAGame {}
 
-    constructor(readonly gameId: number, readonly msgType: string, readonly msg: ToPlayerMessage) {}
+export interface GameInfo {
+    readonly gameId: number;
+    readonly you: PlayerInfo;
+    readonly players: PlayerInfo[];
+    readonly gameStatus: GameStatus;
+}
+
+export interface GameStatus {
+    readonly currentState: GameState;
+    readonly history: GameState[];
+}
+
+export interface PlayerInfo {
+    readonly name: string;
+    readonly index: number;
+    readonly color: FigureColor;
+}
+
+export interface GameState {
+    readonly nTurn: number;
+    readonly activePlayer: number;
+    readonly lastMove: Move;
+    readonly field: Figure[][];
+}
+
+export interface Figure {
+    readonly type: FigureType;
+    readonly color: FigureColor;
+}
+
+export interface Move {
+    readonly player: number;
+    readonly figure: Figure;
+    readonly steps: Step[];
+    readonly status: MoveStatus;
+}
+
+export interface Step {
+    readonly start: P;
+    readonly end: P;
+    readonly shot?: P | null;
+    readonly shotFigure?: Figure | null;
+}
+
+export interface P {
+    readonly l: number;
+    readonly c: number;
 }

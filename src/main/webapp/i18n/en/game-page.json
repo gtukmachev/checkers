@@ -2,6 +2,7 @@
     "game-page": {
         "title": "Game",
         "subtitle": "Start the game!",
-        "sendStep": "Step!"
+        "sendStep": "Step!",
+        "clear": "clear"
     }
 }

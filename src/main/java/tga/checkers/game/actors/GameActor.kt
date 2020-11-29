@@ -8,6 +8,7 @@ import tga.checkers.exts.CycleList
 import tga.checkers.exts.on
 import tga.checkers.exts.sec
 import tga.checkers.exts.tellToSelfAfter
+import tga.checkers.game.*
 
 interface GameActorMessage
          class StartGame: GameActorMessage
@@ -16,9 +17,11 @@ interface GameActorMessage
 
 data class Player(
         val name: String,
-        val num: Int,
+        val index: Int,
         val actor: ActorRef
-)
+) {
+    fun toPlayerInfo(): PlayerInfo = PlayerInfo(name = name, index = index, colorOf(index))
+}
 
 class GameActor(
         val gameId: Int,
@@ -26,11 +29,11 @@ class GameActor(
         val websocket: SimpMessagingTemplate
 ) : AbstractLoggingActor() {
 
-    var activePlayerNode: CycleList<Player> = playersCycle
+    private var activePlayerNode: CycleList<Player> = playersCycle
+    private val activePlayer: Player get() = activePlayerNode.obj
 
-    val player: Player get() = activePlayerNode.obj
-
-    var nTurn: Int = 0
+    private var currentState: GameState = GameState.initialState()
+    private var history: List<GameState> = listOf()
 
     override fun preStart() {
         log().debug("preStart")
@@ -39,59 +42,95 @@ class GameActor(
 
     override fun createReceive(): Receive = gameStartingBehavior
 
+
     private val gameStartingBehavior = ReceiveBuilder()
             .on(StartGame::class   ){ onStartGame() }
             .on(FirstTurn::class   ){ onFirstTurn() }
             .build()
 
 
-    private val waitingForStepBehavior = ReceiveBuilder()
-            .on(PlayerStep::class, { sender == player.actor }){ onPlayerStep(it)              }
-            .on(PlayerStep::class                            ){ onWrongPlayerStep(it, sender) }
-            .on(NotifyPlayer::class                          ){ onNotifyPlayer(it)            }
+    private val waitingForStepsBehavior = ReceiveBuilder()
+            .on(PlayerStep::class, { sender == activePlayer.actor }){ onPlayerStep(it)              }
+            .on(PlayerStep::class                                  ){ onWrongPlayerStep(it, sender) }
+            .on(NotifyPlayer::class                                ){ onNotifyPlayer(it)            }
             .build()
+
 
     private fun onNotifyPlayer(notifyPlayerMsg: NotifyPlayer) {
         val pl = playersCycle.firstOrNull{ it.name == notifyPlayerMsg.userName }
-        pl?.let{ sendGameStatusToPlayer(it) }
+        pl?.let{ sendGameInfoToPlayer(it) }
     }
 
     private fun onStartGame() {
         log().debug("onStartGame")
-        playersCycle.forEach( ::sendGameStatusToPlayer )
+        playersCycle.forEach( ::sendGameInfoToPlayer )
 
         tellToSelfAfter( 1.sec() ){ FirstTurn() }
     }
 
-    private fun sendGameStatusToPlayer(pl: Player) {
-        val users = playersCycle.map { it.name }
-        val msg = GameStatus(
-                gameId = gameId,
-                players = users,
-                activePlayer = player.name
+    private fun sendGameInfoToPlayer(pl: Player) {
+        log().debug("sendGameInfoToPlayer(pl={})", pl)
+        val gameInfo = GameInfo(
+                gameId  = gameId,
+                you     = pl.toPlayerInfo(),
+                players = playersCycle.map{ it.toPlayerInfo() },
+                gameStatus = GameStatus(
+                        currentState = currentState,
+                        history      = history
+                )
         )
-        pl.actor.tell(msg, self)
+        log().debug("sendGameInfoToPlayer(pl={}) => gameInfo={}", gameInfo)
+        pl.actor.tell(gameInfo, self)
     }
 
-    private fun onFirstTurn() = nextTurn()
-
-    private fun nextTurn() {
-        nTurn++
-        log().debug("nextTurn() : {}", nTurn)
-
-        switchActivePlayer()
-        checkIfCurrentPlayerLooseTheGame()
-        notifyActiveUserAboutHisStep()
-        context.become( waitingForStepBehavior )
+    private fun onFirstTurn() {
+        context.become( waitingForStepsBehavior )
     }
+
 
     private fun onPlayerStep(playerStep: PlayerStep) {
         log().debug("onPlayerStep(playerStep={})", playerStep)
-        nextTurn()
+        this.history = history + currentState        // save the current state to history. IMPORTANT: the list should be immutable - don't change it!
+
+        // process the active player step
+        this.currentState = performPlayerStep(playerStep){
+            // this callback will be invoked only and only if the current step is proceed without any errors
+            switchActivePlayerToNextOne()
+            activePlayer.index
+        }
+
+        checkIfPreviousStepWinTheGame()
+        checkIfCurrentPlayerLooseTheGame()
+        notifyPlayersAboutStepResult()
+
     }
 
-    private fun switchActivePlayer() {
-        log().debug("switchActivePlayer()")
+    private fun performPlayerStep(playerStep: PlayerStep, calculateNextPlayer: () -> Int): GameState {
+        log().debug("performPlayerStep({})", playerStep)
+        //TODO("Not yet implemented")
+
+        val step = Step(
+                start = P(playerStep.lin, playerStep.col),
+                shot = null,
+                shotFigure = null,
+                end = P(playerStep.lin + 1, playerStep.col + 1)
+        )
+        val move = Move(activePlayer.index, Figure.b, listOf(step), MoveStatus.OK)
+
+        val newActivePlayerIndex: Int = calculateNextPlayer()
+        val newGameState = GameState(
+                nTurn = currentState.nTurn + 1,
+                activePlayer = newActivePlayerIndex,
+                lastMove = move,
+                field = currentState.field
+        )
+
+        return newGameState
+    }
+
+
+    private fun switchActivePlayerToNextOne() {
+        log().debug("switchActivePlayerToNextOne()")
         activePlayerNode = activePlayerNode.next!!
     }
 
@@ -100,10 +139,18 @@ class GameActor(
         //TODO("Not yet implemented")
     }
 
-    private fun notifyActiveUserAboutHisStep() {
-        log().debug("notifyActiveUserAboutHisStep()")
-        player.actor.tell( YourStep(nTurn), self)
+    private fun checkIfPreviousStepWinTheGame() {
+        log().debug("checkIfPreviousStepWinTheGame()")
+        //TODO("Not yet implemented")
     }
+
+    private fun notifyPlayersAboutStepResult() {
+        log().debug("notifyActiveUserAboutHisStep()")
+        playersCycle.forEach{
+            it.actor.tell(currentState, self)
+        }
+    }
+
 
     private fun onWrongPlayerStep(playerStep: PlayerStep, wrongPlayerActor: ActorRef) {
         log().debug("onWrongPlayerStep(playerStep={}, wrongPlayerActor={})", playerStep, wrongPlayerActor)
@@ -112,3 +159,4 @@ class GameActor(
     }
 
 }
+

@@ -5,10 +5,14 @@ import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.http.HttpStatus
+import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.messaging.simp.annotation.SubscribeMapping
 import org.springframework.stereotype.Controller
+import org.springframework.web.client.HttpStatusCodeException
+import tga.checkers.exts.millis
 import tga.checkers.exts.sec
 import tga.checkers.game.actors.GameRequest
 import tga.checkers.game.actors.PlayerStep
@@ -34,6 +38,20 @@ class GameWebService(
     fun connectToGameChannel(principal: Principal) {
         gameMakerActor.tell( StatusRequest(principal.name), ActorRef.noSender() )
     }
+
+/*
+    class OnlineGameNotFoundException(gameId: Int) : HttpStatusCodeException( HttpStatus.NOT_FOUND, "Online game (id=$gameId) not found" )
+
+    @SubscribeMapping("/topic/game/{gameId:\\d+}")
+    fun onSubscribeToPublicGameChannel(
+            @DestinationVariable("gameId") gameId: Int,
+            principal: Principal
+    ) {
+        val gameActor = findGameActor(gameId)
+                ?: throw OnlineGameNotFoundException(gameId)
+        gameActor.tell( StatusRequest(principal.name), ActorRef.noSender() )
+    }
+*/
 
 
     /**
@@ -61,14 +79,16 @@ class GameWebService(
     }
 
 
-    private fun findPlayerActor(playerName: String): ActorRef? {
-        val actorName = "/user/game-maker/player-$playerName"
+    private fun findPlayerActor(playerName: String) = findActor("/user/game-maker/player-$playerName")
+    private fun findGameActor(gameId: Int) = findActor("/user/game-maker/game-$gameId")
+
+    private fun findActor(actorName: String): ActorRef? {
         return try {
             akka
-                .actorSelection(actorName)
-                .resolveOne(1.sec())
-                .toCompletableFuture()
-                .get(1, TimeUnit.SECONDS)
+                    .actorSelection(actorName)
+                    .resolveOne(20.millis())
+                    .toCompletableFuture()
+                    .get(20, TimeUnit.MILLISECONDS)
 
         } catch (t: ActorNotFound) {
             log.error("""

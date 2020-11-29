@@ -70,7 +70,7 @@ class GamesMakerActor(
     private fun respondWithWaitingStatus(userName: String) {
         log().debug("respondWithWaitingStatus(userName={})", userName)
         val msg = WaitingForAGame
-        val gameMessage = GameMessage(-1, msg.javaClass.simpleName, msg)
+        val gameMessage = WebServiceOutcomeMessage(-1, msg.javaClass.simpleName, msg)
         websocket.convertAndSendToUser(userName, "/queue/game", gameMessage)
     }
 
@@ -84,10 +84,9 @@ class GamesMakerActor(
         val gameId = (++gamesCounter)
 
         val playerActorsCollection: Collection<Player> = playerNames.mapIndexed{ i, playerName ->
-            val playerNum = i + 1
-            val playerActor = context.actorOf("player-$playerName"){ PlayerActor(gameId, playerName, playerNum, websocket) }
+            val playerActor = context.actorOf("player-$playerName"){ PlayerActor(gameId, playerName, i, websocket) }
             context.watch(playerActor)
-            Player(playerName, playerNum, playerActor)
+            Player(playerName, i, playerActor)
         }
 
         val playersCycle: CycleList<Player> = playerActorsCollection.toCyclyList()!!

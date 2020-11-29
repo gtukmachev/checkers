@@ -6,7 +6,7 @@ import { Location } from '@angular/common';
 import { Observable } from 'rxjs';
 import { IMessage } from '@stomp/stompjs';
 import { map } from 'rxjs/operators';
-import { GameMessage, ToPlayerMessage } from 'app/core/game-maker/GameMessages';
+import { GameMessage } from 'app/core/game-maker/GameMessages';
 import { IStep } from 'app/core/game-maker/IStep';
 
 @Injectable({
@@ -39,20 +39,19 @@ export class GameMakerService {
 
     /**
      * A player should call this method in order to send his step to game server
-     * @param gameId: number
      * @param step: IStep
      */
     sendStep(step: IStep) {
         const msg = JSON.stringify(step);
-        this.getConnectedStompService().publish(`/queue/game`, msg);
+        this.getConnectedStompService().publish(`/queue/steps`, msg);
     }
 
-    private _userGameChannel: Observable<ToPlayerMessage> | null = null;
-    get userGameChannel(): Observable<ToPlayerMessage> {
+    private _userGameChannel: Observable<GameMessage> | null = null;
+    get userGameChannel(): Observable<GameMessage> {
         if (this._userGameChannel == null) {
             this._userGameChannel = this.getConnectedStompService()
                 .watch('/user/queue/game')
-                .pipe(map<IMessage, ToPlayerMessage>((msg: IMessage) => GameMessage.of(msg.body).msg));
+                .pipe(map<IMessage, GameMessage>((msg: IMessage) => JSON.parse(msg.body) as GameMessage));
         }
         return this._userGameChannel;
     }
