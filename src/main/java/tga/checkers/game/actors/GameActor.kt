@@ -13,7 +13,7 @@ import tga.checkers.game.*
 interface GameActorMessage
          class StartGame: GameActorMessage
          class FirstTurn: GameActorMessage
-    data class NotifyPlayer(val userName: String): GameActorMessage
+    data class NotifyPlayer(val userName: String): GameActorMessage, WebServiceIncomeMessage
 
 data class Player(
         val name: String,

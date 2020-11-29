@@ -1,13 +1,13 @@
-import { Injectable } from '@angular/core';
-import { StompRService } from '@stomp/ng2-stompjs';
+import {Injectable} from '@angular/core';
+import {StompRService} from '@stomp/ng2-stompjs';
 import * as SockJS from 'sockjs-client';
-import { AuthServerProvider } from '../auth/auth-jwt.service';
-import { Location } from '@angular/common';
-import { Observable } from 'rxjs';
-import { IMessage } from '@stomp/stompjs';
-import { map } from 'rxjs/operators';
-import { GameMessage } from 'app/core/game-maker/GameMessages';
-import { IStep } from 'app/core/game-maker/IStep';
+import {AuthServerProvider} from '../auth/auth-jwt.service';
+import {Location} from '@angular/common';
+import {Observable} from 'rxjs';
+import {IMessage} from '@stomp/stompjs';
+import {map} from 'rxjs/operators';
+import {GameMessage} from 'app/core/game-maker/GameMessages';
+import {IStep} from 'app/core/game-maker/IStep';
 
 @Injectable({
     providedIn: 'root',
@@ -33,7 +33,7 @@ export class GameMakerService {
      * }
      *
      */
-    findGame() {
+    public findGame() {
         this.getConnectedStompService().publish('/queue/new-game');
     }
 
@@ -41,9 +41,23 @@ export class GameMakerService {
      * A player should call this method in order to send his step to game server
      * @param step: IStep
      */
-    sendStep(step: IStep) {
+    public sendStep(step: IStep) {
         const msg = JSON.stringify(step);
         this.getConnectedStompService().publish(`/queue/steps`, msg);
+    }
+
+    /**
+     * <p>
+     *     This methods - a capability to restore game state in case of any errors.<br/>
+     *     Usually, this method will be never invoked, because, in case of connection
+     *     lost - after the reconnection, the client will automatically restore all<br/>
+     *     the subscriptions (hanks to the StompRService)  and the server will <br/>
+     *     update us (it's a default react on subscription) with the current game state.
+     * </p>
+     * <p> But, if state is broken for some reason - we can use this function </p>
+     */
+    public updateGameStateRequest(){
+        this.getConnectedStompService().publish("/queue/state");
     }
 
     private _userGameChannel: Observable<GameMessage> | null = null;

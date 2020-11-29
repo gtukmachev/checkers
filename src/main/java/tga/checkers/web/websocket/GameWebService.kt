@@ -5,16 +5,13 @@ import akka.actor.ActorRef
 import akka.actor.ActorSystem
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
-import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.messaging.simp.annotation.SubscribeMapping
 import org.springframework.stereotype.Controller
-import org.springframework.web.client.HttpStatusCodeException
 import tga.checkers.exts.millis
-import tga.checkers.exts.sec
 import tga.checkers.game.actors.GameRequest
+import tga.checkers.game.actors.NotifyPlayer
 import tga.checkers.game.actors.PlayerStep
 import tga.checkers.game.actors.StatusRequest
 import java.security.Principal
@@ -36,23 +33,9 @@ class GameWebService(
      */
     @SubscribeMapping("/user/queue/game")
     fun connectToGameChannel(principal: Principal) {
+        log.debug("@SubscribeMapping(\"/user/queue/game\") => connectToGameChannel", principal.name)
         gameMakerActor.tell( StatusRequest(principal.name), ActorRef.noSender() )
     }
-
-/*
-    class OnlineGameNotFoundException(gameId: Int) : HttpStatusCodeException( HttpStatus.NOT_FOUND, "Online game (id=$gameId) not found" )
-
-    @SubscribeMapping("/topic/game/{gameId:\\d+}")
-    fun onSubscribeToPublicGameChannel(
-            @DestinationVariable("gameId") gameId: Int,
-            principal: Principal
-    ) {
-        val gameActor = findGameActor(gameId)
-                ?: throw OnlineGameNotFoundException(gameId)
-        gameActor.tell( StatusRequest(principal.name), ActorRef.noSender() )
-    }
-*/
-
 
     /**
      * Request to start a new game.
@@ -60,6 +43,7 @@ class GameWebService(
      */
     @MessageMapping("/queue/new-game")
     fun gameMakeRequest(principal: Principal) {
+        log.debug("@MessageMapping(\"/queue/new-game\") => gameMakeRequest()", principal.name)
         val msg = GameRequest( principal.name )
         gameMakerActor.tell(msg, ActorRef.noSender())
     }
@@ -73,9 +57,18 @@ class GameWebService(
                      principal: Principal,
             @Payload      step: PlayerStep
     ) {
-        log.debug("fromPlayer(principal={})", principal.name, step)
+        log.debug("@MessageMapping(\"/queue/steps\") => fromPlayer(principal={})", principal.name, step)
         val playerActor = findPlayerActor(principal.name)
         playerActor?.tell(step, ActorRef.noSender())
+    }
+
+    @MessageMapping("/queue/state")
+    fun gameInfoRequest(
+            principal: Principal
+    ) {
+        log.debug("@MessageMapping(\"/queue/state\") => gameInfoRequest()", principal.name)
+        val playerActor = findPlayerActor(principal.name)
+        playerActor?.tell( NotifyPlayer(principal.name) , ActorRef.noSender())
     }
 
 
@@ -94,8 +87,8 @@ class GameWebService(
             log.error("""
                 The actor not found: '$actorName'.
                 Check application configuration of the WebSocket security layer:
-                    the message should be rejected on the security layer, 
-                    and do no achieve the controller!
+                the message should be rejected on the security layer, 
+                and do no achieve the controller!
             """.trimIndent(), t)
             null
         }

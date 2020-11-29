@@ -8,7 +8,7 @@ import tga.checkers.exts.on
 
 
 interface PlayerActorMessage
-    class JoinToGame(val gameActor: ActorRef): PlayerActorMessage
+    data class JoinToGame(val gameActor: ActorRef): PlayerActorMessage
 
 
 class PlayerActor(
