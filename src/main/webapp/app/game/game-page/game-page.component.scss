@@ -1,0 +1,20 @@
+$board-cell-size: 3em;
+
+.board {
+    .cell {
+        //width: $board-cell-size;
+        //height: $board-cell-size;
+        padding: 0;
+        font-size: 2.7em;
+    }
+
+    .dark {
+        background-color: #6d3d26;
+        color: #f4eee0;
+    }
+
+    .light {
+        background-color: #f4eee0;
+        color: #6d3d26;
+    }
+}

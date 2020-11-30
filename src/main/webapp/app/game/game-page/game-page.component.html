@@ -1,33 +1,52 @@
 <div class="row">
     <div class="col-sm-12" align="center">
-        <div class="alert alert-warning">
-            <p jhiTranslate="error.page-under-construction">Sorry, but the page is under construction yet!</p>
-            <a class="alert-link" routerLink="/" jhiTranslate="global.messages.goto.home">Go to the Home page</a>
-        </div>
 
         <div class="row">
             <div class="column">
                 <button type="button" class="btn btn-outline-primary" (click)="startGameRequest()">
-                    <h1 class="display-4" jhiTranslate="game-page.subtitle">...</h1>
+                    <span jhiTranslate="game-page.subtitle">...</span>
                 </button>
             </div>
             <div class="column">
                 <button type="button" class="btn btn-outline-secondary" (click)="sendStepToServer()">
-                    <h1 class="display-4" jhiTranslate="game-page.sendStep">Step!</h1>
+                    <span jhiTranslate="game-page.sendStep">Step!</span>
                 </button>
             </div>
             <div class="column">
                 <button type="button" class="btn btn-outline-secondary" (click)="clearLog()">
-                    <h1 class="display-4" jhiTranslate="game-page.clear">Clear!</h1>
+                    <span jhiTranslate="game-page.clear">Clear!</span>
                 </button>
             </div>
         </div>
 
-        <div class="alert alert-info">
-            <h4>Income messages:</h4>
-            <ul>
-                <li *ngFor="let msg of incomeMessages">{{msg.constructor.name}}: {{msg | json}}</li>
-            </ul>
+        <div *ngIf="currentState" class="board">
+            <div class="row">
+                <div class="col"></div>
+                <div class="col" *ngFor="let cell of currentState.field[0]; let c = index;">
+                    {{colChar[c]}}
+                </div>
+                <div class="col"></div>
+            </div>
+
+            <div class="row" *ngFor="let row of currentState.field let l = index;">
+                <div class="col"><h1>{{8-l}}</h1></div>
+                <div class="col cell" *ngFor="let cell of currentState.field[7-l]; let c = index;" [ngClass]="{
+                        dark:  ((l + c) % 2) == 1,
+                        light: ((l + c) % 2) == 0
+                     }">
+                    <jhi-figure [figure]="cell"></jhi-figure>
+                </div>
+                <div class="col"><h1>{{8-l}}</h1></div>
+            </div>
+
+            <div class="row">
+                <div class="col"></div>
+                <div class="col" *ngFor="let cell of currentState.field[0]; let c = index;">
+                    {{colChar[c]}}
+                </div>
+                <div class="col"></div>
+            </div>
+
         </div>
 
     </div>

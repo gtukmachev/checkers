@@ -1,0 +1,40 @@
+.df {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    height: 90%;
+    border-radius: 50%;
+    border-style: solid;
+    border-width: 7px;
+}
+
+.white {
+    color: #d8d8d8;
+    border-color: white;
+    background-color: #d8d8d8;
+    &:hover {
+        border-color: #ffd83c;
+    }
+}
+
+.black {
+    color: black;
+    border-color: black;
+    background-color: gray;
+    &:hover {
+        border-color: #af3131;
+    }
+}
+
+.transparent {
+    color: transparent;
+    border-color: transparent;
+    background-color: transparent;
+}
+
+.white.quinn,
+.black.quinn {
+    background-color: red;
+}

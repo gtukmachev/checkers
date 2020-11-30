@@ -4,12 +4,11 @@ import tga.checkers.game.actors.ToPlayerMessage
 
 enum class FigureType{ STONE, QUINN }
 enum class FigureColor{ BLACK, WHITE }
-enum class Figure(val type: FigureType, val color: FigureColor) {
-    b(FigureType.STONE, FigureColor.BLACK),
-    w(FigureType.STONE, FigureColor.WHITE),
-    bq(FigureType.QUINN, FigureColor.BLACK),
-    wq(FigureType.QUINN, FigureColor.WHITE),
-}
+data class Figure(val type: FigureType, val color: FigureColor)
+val b  = Figure(FigureType.STONE, FigureColor.BLACK)
+val w  = Figure(FigureType.STONE, FigureColor.WHITE)
+val bq = Figure(FigureType.QUINN, FigureColor.BLACK)
+val wq = Figure(FigureType.QUINN, FigureColor.WHITE)
 
 fun colorOf(index: Int): FigureColor = FigureColor.values()[index]
 
@@ -21,23 +20,21 @@ data class GameState(
 ) : ToPlayerMessage {
     companion object {
         private val o: Figure? = null
-        private val w = Figure.w
-        private val b = Figure.b
-        private val noMove = Move(-1, Figure.w, listOf(), MoveStatus.EMPTY)
+        private val noMove = Move(-1, w, listOf(), MoveStatus.EMPTY)
 
         fun initialState(): GameState = GameState(
                 nTurn = 0,
                 activePlayer = 0,
                 lastMove = noMove,
                 field = arrayOf(
-                    arrayOf(w, o, w, o, w, o, w, o),
+                    arrayOf(w, o, w, o,wq, o, w, o),
                     arrayOf(o, w, o, w, o, w, o, w),
                     arrayOf(w, o, w, o, w, o, w, o),
                     arrayOf(o, o, o, o, o, o, o, o),
                     arrayOf(o, o, o, o, o, o, o, o),
-                    arrayOf(o, b, o, b, o, b, o, w),
+                    arrayOf(o, b, o, b, o, b, o, b),
                     arrayOf(b, o, b, o, b, o, b, o),
-                    arrayOf(o, b, o, b, o, b, o, w),
+                    arrayOf(o, b, o,bq, o, b, o, b),
                 )
         )
     }

@@ -115,7 +115,7 @@ class GameActor(
                 shotFigure = null,
                 end = P(playerStep.lin + 1, playerStep.col + 1)
         )
-        val move = Move(activePlayer.index, Figure.b, listOf(step), MoveStatus.OK)
+        val move = Move(activePlayer.index, b, listOf(step), MoveStatus.OK)
 
         val newActivePlayerIndex: Int = calculateNextPlayer()
         val newGameState = GameState(

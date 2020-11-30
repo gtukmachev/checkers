@@ -9,17 +9,19 @@ export interface GameMessage {
 }
 
 export enum FigureType {
-    STONE,
-    QUINN,
+    STONE = 'STONE',
+    QUINN = 'QUINN',
+    EMPTY = '',
 }
 export enum FigureColor {
-    BLACK,
-    WHITE,
+    BLACK = 'BLACK',
+    WHITE = 'WHITE',
+    EMPTY = '',
 }
 export enum MoveStatus {
-    EMPTY,
-    OK,
-    ERROR,
+    OK = 'OK',
+    EMPTY = '',
+    ERROR = 'ERROR',
 }
 
 export interface Figure {
@@ -27,12 +29,11 @@ export interface Figure {
     readonly color: FigureColor;
 }
 
-const  b:Figure = {type: FigureType.STONE, color: FigureColor.BLACK}
-const  w:Figure = {type: FigureType.STONE, color: FigureColor.WHITE}
-const bq:Figure = {type: FigureType.QUINN, color: FigureColor.BLACK}
-const wq:Figure = {type: FigureType.QUINN, color: FigureColor.WHITE}
-const  o:Figure | null = null
-
+export const b: Figure = { type: FigureType.STONE, color: FigureColor.BLACK };
+export const w: Figure = { type: FigureType.STONE, color: FigureColor.WHITE };
+export const bq: Figure = { type: FigureType.QUINN, color: FigureColor.BLACK };
+export const wq: Figure = { type: FigureType.QUINN, color: FigureColor.WHITE };
+export const o: Figure | null = null;
 
 export interface ItIsNotYourStepError {}
 
@@ -68,17 +69,18 @@ export function initialGameState(): GameState {
         nTurn: 0,
         activePlayer: 0,
         lastMove: null,
-        field: [[w, o, w, o, w, o, w, o],
-                [o, w, o, w, o, w, o, w],
-                [w, o, w, o, w, o, w, o],
-                [o, o, o, o, o, o, o, o],
-                [o, o, o, o, o, o, o, o],
-                [o, b, o, b, o, b, o, b],
-                [b, o, b, o, b, o, b, o],
-                [o, b, o, b, o, b, o, b]]
-    }
+        field: [
+            [w, o, w, o, wq, o, w, o],
+            [o, w, o, w, o, w, o, w],
+            [w, o, w, o, w, o, w, o],
+            [o, o, o, o, o, o, o, o],
+            [o, o, o, o, o, o, o, o],
+            [o, b, o, b, o, b, o, b],
+            [b, o, b, o, b, o, b, o],
+            [o, b, o, bq, o, b, o, b],
+        ],
+    };
 }
-
 
 export interface Move {
     readonly player: number;
