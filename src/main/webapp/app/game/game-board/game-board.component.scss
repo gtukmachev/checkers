@@ -2,34 +2,42 @@
     $board-border-color: #2d2004;
     $board-dark-color: #573e07;
     $board-light-color: #ffd67e;
-    $board-letters-color: $board-border-color;
+    $board-letters-color: #2d2307;
+    $board-letters-fill: #ffd67e;
     $border-cell-highlight-color: #ff4800;
+
+    $cell-border-size: 7;
 
     .border {
         stroke: $board-border-color;
-        stroke-width: 5;
+        stroke-width: 4;
         stroke-linecap: round;
-        fill: transparent;
+        fill: #fff4d8;
     }
 
     .coordinate {
         alignment-baseline: middle;
         stroke: $board-letters-color;
-        fill: $board-letters-color;
+        fill: $board-letters-fill;
     }
 
     .cell {
+        stroke-width: $cell-border-size;
+
         &.light {
             fill: $board-light-color;
+            stroke: $board-light-color;
+            &:hover {
+                stroke: $border-cell-highlight-color;
+            }
         }
 
         &.dark {
             fill: $board-dark-color;
-        }
-
-        &:hover {
-            stroke: $border-cell-highlight-color;
-            stroke-width: 4;
+            stroke: $board-dark-color;
+            &:hover {
+                stroke: $border-cell-highlight-color;
+            }
         }
     }
 }

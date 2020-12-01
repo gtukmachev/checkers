@@ -19,38 +19,16 @@
             </div>
         </div>
 
-        <jhi-game-board [field]="currentState.field"></jhi-game-board>
-<!--
-        <div *ngIf="currentState" class="board">
-            <div class="row">
-                <div class="col"></div>
-                <div class="col" *ngFor="let cell of currentState.field[0]; let c = index;">
-                    {{colChar[c]}}
-                </div>
-                <div class="col"></div>
-            </div>
+        <div class="row">
 
-            <div class="row" *ngFor="let row of currentState.field let l = index;">
-                <div class="col"><h1>{{8-l}}</h1></div>
-                <div class="col cell" *ngFor="let cell of currentState.field[7-l]; let c = index;" [ngClass]="{
-                        dark:  ((l + c) % 2) == 1,
-                        light: ((l + c) % 2) == 0
-                     }">
-                    <jhi-figure [figure]="cell"></jhi-figure>
-                </div>
-                <div class="col"><h1>{{8-l}}</h1></div>
+            <div class="
+                offset-xl-1 col-xl-5
+                offset-lg-1 col-lg-7
+                offset-md-1 col-md-9
+                col-sm-12
+            ">
+                <jhi-game-board [field]="currentState.field"></jhi-game-board>
             </div>
-
-            <div class="row">
-                <div class="col"></div>
-                <div class="col" *ngFor="let cell of currentState.field[0]; let c = index;">
-                    {{colChar[c]}}
-                </div>
-                <div class="col"></div>
-            </div>
-
         </div>
--->
-
     </div>
 </div>
