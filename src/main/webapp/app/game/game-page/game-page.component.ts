@@ -8,10 +8,12 @@ import {
     GameStatus,
     initialGameState,
     ItIsNotYourStepError,
+    P,
     PlayerInfo,
     WaitingForAGame,
 } from 'app/core/game-maker/GameMessages';
 import { Subscription } from 'rxjs';
+import { IStep } from 'app/core/game-maker/IStep';
 
 @Component({
     selector: 'jhi-game-page',
@@ -89,11 +91,11 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.gameMakerService.findGame();
     }
 
-    sendStepToServer() {
-        this.counter += 1;
-        const step = {
-            lin: this.counter,
-            col: this.counter,
+    sendStepToServer(cellsQueue: P[]) {
+        console.log('sendStepToServer: [' + cellsQueue.map(p => `{l:${p.l}, c:${p.c}}`).join(', ') + ']');
+        const step: IStep = {
+            nTurn: this.currentState.nTurn,
+            cellsQueue: cellsQueue,
         };
         this.gameMakerService.sendStep(step);
     }

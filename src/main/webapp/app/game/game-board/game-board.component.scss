@@ -30,6 +30,10 @@
             &:hover {
                 stroke: $border-cell-highlight-color;
             }
+            &.active {
+                fill: #ffc23f;
+                stroke: #ff804b;
+            }
         }
 
         &.dark {
@@ -37,6 +41,10 @@
             stroke: $board-dark-color;
             &:hover {
                 stroke: $border-cell-highlight-color;
+            }
+            &.active {
+                fill: #71582a;
+                stroke: #ff804b;
             }
         }
     }

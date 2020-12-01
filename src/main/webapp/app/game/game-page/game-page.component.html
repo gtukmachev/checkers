@@ -27,7 +27,9 @@
                 offset-md-1 col-md-9
                 col-sm-12
             ">
-                <jhi-game-board [field]="currentState.field"></jhi-game-board>
+                <jhi-game-board [field]="currentState.field"
+                                (doMove)="sendStepToServer($event)"
+                ></jhi-game-board>
             </div>
         </div>
     </div>

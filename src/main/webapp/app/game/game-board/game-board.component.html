@@ -24,14 +24,15 @@
         <rect *ngFor="let cell of field[7-l]; let c = index;"
               class="cell"
               [ngClass]="{
-                    dark:((l+c) % 2 == 0),
-                    light:((l+c) % 2 == 1)
+                    dark:(((7-l)+c) % 2 == 0),
+                    light:(((7-l)+c) % 2 == 1),
+                    active: activeCells[7-l][c]
               }"
-              [attr.c]="c" [attr.l]="l"
               [attr.x]="startPoint + c*cellSize + cellOffset"
               [attr.y]="startPoint + l*cellSize + cellOffset"
               [attr.width]="cellInnerSize"
               [attr.height]="cellInnerSize"
+              (click)="cellClick(7-l, c)"
         ></rect>
     </g>
 

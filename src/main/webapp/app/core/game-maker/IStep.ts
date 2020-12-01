@@ -1,4 +1,6 @@
+import { P } from 'app/core/game-maker/GameMessages';
+
 export interface IStep {
-    lin: number;
-    col: number;
+    nTurn: number;
+    cellsQueue: P[];
 }
