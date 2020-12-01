@@ -1,0 +1,35 @@
+.board {
+    $board-border-color: #2d2004;
+    $board-dark-color: #573e07;
+    $board-light-color: #ffd67e;
+    $board-letters-color: $board-border-color;
+    $border-cell-highlight-color: #ff4800;
+
+    .border {
+        stroke: $board-border-color;
+        stroke-width: 5;
+        stroke-linecap: round;
+        fill: transparent;
+    }
+
+    .coordinate {
+        alignment-baseline: middle;
+        stroke: $board-letters-color;
+        fill: $board-letters-color;
+    }
+
+    .cell {
+        &.light {
+            fill: $board-light-color;
+        }
+
+        &.dark {
+            fill: $board-dark-color;
+        }
+
+        &:hover {
+            stroke: $border-cell-highlight-color;
+            stroke-width: 4;
+        }
+    }
+}

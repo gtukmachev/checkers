@@ -1,0 +1,43 @@
+<svg [attr.width]="totalSize" [attr.height]="totalSize" class="board">
+    <g>
+        <rect [attr.x]="0" [attr.y]="0" [attr.width]="totalSize" [attr.height]="totalSize" class="border"></rect>
+        <rect [attr.x]="borderInnerSize" [attr.y]="borderInnerSize" [attr.width]="totalSize - 2*borderInnerSize" [attr.height]="totalSize - 2*borderInnerSize" class="border"></rect>
+    </g>
+
+    <g>
+        <text *ngFor="let row of field; let l = index;"  class="coordinate" font-size="30"
+              [attr.x]="borderSize/2"
+              [attr.y]="borderSize + (l*cellSize) + cellCenter"
+        >{{l+1}}</text>
+    </g>
+
+    <g>
+        <text *ngFor="let col of field[0]; let c = index;" class="coordinate" font-size="30"
+              [attr.x]="borderSize + (c*cellSize) + cellCenter"
+              [attr.y]="borderInnerSize + ((borderSize-borderInnerSize)/100)*60"
+        >{{colChar[c]}}</text>
+    </g>
+
+    <g *ngFor="let row of field; let l = index;">
+        <rect *ngFor="let cell of field[7-l]; let c = index;"
+                [attr.x]="startPoint + c*cellSize" [attr.y]="startPoint + l*cellSize"
+                [attr.width]="cellSize" [attr.height]="cellSize"
+              class="cell" [ngClass]="{ dark:((l+c) % 2 == 0), light:((l+c) % 2 == 1) }"
+        ></rect>
+    </g>
+
+    <g>
+        <text *ngFor="let row of field; let l = index;"  class="coordinate" font-size="30"
+              [attr.x]="totalSize - borderSize/2-15"
+              [attr.y]="borderSize + (l*cellSize) + cellCenter"
+        >{{l+1}}</text>
+    </g>
+
+    <g>
+        <text *ngFor="let col of field[0]; let c = index;" class="coordinate" font-size="30"
+              [attr.x]="borderSize + (c*cellSize) + cellCenter"
+              [attr.y]="totalSize - (borderInnerSize + ((borderSize-borderInnerSize)/100)*50)"
+        >{{colChar[c]}}</text>
+    </g>
+
+</svg>
