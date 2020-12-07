@@ -1,53 +1,73 @@
 <svg width="100%" [attr.viewBox]="vb" class="board">
-<!--
     <g>
-        <rect [attr.x]="0" [attr.y]="0" [attr.width]="totalSize" [attr.height]="totalSize" class="border"></rect>
-        <rect [attr.x]="borderInnerSize" [attr.y]="borderInnerSize" [attr.width]="totalSize - 2*borderInnerSize" [attr.height]="totalSize - 2*borderInnerSize" class="border"></rect>
+        <rect [attr.x]="b1" [attr.y]="b1" [attr.width]="b1s" [attr.height]="b1s" class="border"></rect>
+        <rect [attr.x]="b2" [attr.y]="b2" [attr.width]="b2s" [attr.height]="b2s" class="border"></rect>
+        <rect [attr.x]="b3" [attr.y]="b3" [attr.width]="b3s" [attr.height]="b3s" class="border"></rect>
+        <rect [attr.x]="b4" [attr.y]="b4" [attr.width]="b4s" [attr.height]="b4s" class="border"></rect>
+
+        <g>
+            <rect [attr.x]="con01" [attr.y]="con01" [attr.width]="cornerSize" [attr.height]="cornerSize" class="border"></rect>
+            <rect [attr.x]="con00" [attr.y]="con00" [attr.width]="cornerSize" [attr.height]="cornerSize" class="border"></rect>
+
+            <rect [attr.x]="con11" [attr.y]="con01" [attr.width]="cornerSize" [attr.height]="cornerSize" class="border"></rect>
+            <rect [attr.x]="con10" [attr.y]="con00" [attr.width]="cornerSize" [attr.height]="cornerSize" class="border"></rect>
+
+            <rect [attr.x]="con11" [attr.y]="con11" [attr.width]="cornerSize" [attr.height]="cornerSize" class="border"></rect>
+            <rect [attr.x]="con10" [attr.y]="con10" [attr.width]="cornerSize" [attr.height]="cornerSize" class="border"></rect>
+
+            <rect [attr.x]="con01" [attr.y]="con11" [attr.width]="cornerSize" [attr.height]="cornerSize" class="border"></rect>
+            <rect [attr.x]="con00" [attr.y]="con10" [attr.width]="cornerSize" [attr.height]="cornerSize" class="border"></rect>
+        </g>
     </g>
--->
 
     <g>
-        <text *ngFor="let row of field; let l = index;"  class="coordinate" font-size="32"
-              [attr.x]="borderSize/2"
-              [attr.y]="borderSize + (l*cellSize) + cellCenter"
+        <text *ngFor="let l of boardIndex;"  class="coordinate" font-size="32"
+              [attr.x]="startPoint/2"
+              [attr.y]="startPoint + (l*cellSize) + cellCenter"
         >{{8-l}}</text>
     </g>
-
     <g>
-        <text *ngFor="let col of field[0]; let c = index;" class="coordinate" font-size="32"
-              [attr.x]="borderSize + (c*cellSize) + cellCenter"
-              [attr.y]="borderInnerSize + ((borderSize-borderInnerSize)/100)*60"
+        <text *ngFor="let l of boardIndex;"  class="coordinate" font-size="32"
+              [attr.x]="startPoint + (8*cellSize) + startPoint/2"
+              [attr.y]="startPoint + (l*cellSize) + cellCenter"
+        >{{8-l}}</text>
+    </g>
+    <g>
+        <text *ngFor="let c of boardIndex;" class="coordinate" font-size="32"
+              [attr.x]="startPoint + (c*cellSize) + cellCenter"
+              [attr.y]="startPoint/2"
+        >{{colChar[c]}}</text>
+    </g>
+    <g>
+        <text *ngFor="let c of boardIndex;" class="coordinate" font-size="32"
+              [attr.x]="startPoint + (c*cellSize) + cellCenter"
+              [attr.y]="startPoint + (8*cellSize) + startPoint/2"
         >{{colChar[c]}}</text>
     </g>
 
-    <g *ngFor="let row of field; let l = index;">
-        <rect *ngFor="let cell of field[7-l]; let c = index;"
+
+    <g *ngFor="let l of boardIndex;">
+        <rect *ngFor="let c of boardIndex;"
               class="cell"
               [ngClass]="{
                     dark:(((7-l)+c) % 2 == 0),
-                    light:(((7-l)+c) % 2 == 1),
-                    active: activeCells[7-l][c]
+                    light:(((7-l)+c) % 2 == 1)
               }"
-              [attr.x]="startPoint + c*cellSize + cellOffset"
-              [attr.y]="startPoint + l*cellSize + cellOffset"
-              [attr.width]="cellInnerSize"
-              [attr.height]="cellInnerSize"
-              (click)="cellClick(7-l, c)"
+              [attr.x]="startPoint + c * cellSize"
+              [attr.y]="startPoint + l * cellSize"
+              [attr.width]="cellSize"
+              [attr.height]="cellSize"
         ></rect>
     </g>
 
-    <g>
-        <text *ngFor="let row of field; let l = index;"  class="coordinate" font-size="32"
-              [attr.x]="totalSize - borderSize/2-15"
-              [attr.y]="borderSize + (l*cellSize) + cellCenter"
-        >{{8-l}}</text>
-    </g>
-
-    <g>
-        <text *ngFor="let col of field[0]; let c = index;" class="coordinate" font-size="32"
-              [attr.x]="borderSize + (c*cellSize) + cellCenter"
-              [attr.y]="totalSize - (borderInnerSize + ((borderSize-borderInnerSize)/100)*50)"
-        >{{colChar[c]}}</text>
-    </g>
-
+    <circle *ngFor="let f of figures;"
+            [attr.cx]="startPoint + f.c * cellSize + cellCenter"
+            [attr.cy]="startPoint + f.l * cellSize + cellCenter"
+            [attr.r]="stoneRadius"
+            class="shashka"
+            [ngClass]="{
+                        black: f.figure.color == FigureColor_BLACK,
+                        white: f.figure.color == FigureColor_WHITE
+                    }"
+    ></circle>
 </svg>

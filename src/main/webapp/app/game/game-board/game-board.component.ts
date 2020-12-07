@@ -1,5 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Figure, P } from 'app/core/game-maker/GameMessages';
+import { Figure, FigureColor, FigureType, P } from 'app/core/game-maker/GameMessages';
+
+interface F {
+    l: number;
+    c: number;
+    figure: Figure;
+}
 
 @Component({
     selector: 'jhi-game-board',
@@ -11,21 +17,69 @@ export class GameBoardComponent implements OnInit {
     @Input() field: (Figure | null)[][] = [];
     @Output() doMove: EventEmitter<P[]> = new EventEmitter<P[]>();
 
+    FigureType_EMPTY = FigureType.EMPTY;
+    FigureColor_WHITE = FigureColor.WHITE;
+    FigureColor_BLACK = FigureColor.BLACK;
+
+    figures: F[] = [
+        { l: 0, c: 1, figure: { type: FigureType.STONE, color: FigureColor.BLACK } },
+        { l: 0, c: 3, figure: { type: FigureType.STONE, color: FigureColor.BLACK } },
+        { l: 0, c: 5, figure: { type: FigureType.STONE, color: FigureColor.BLACK } },
+        { l: 0, c: 7, figure: { type: FigureType.STONE, color: FigureColor.BLACK } },
+        { l: 1, c: 0, figure: { type: FigureType.STONE, color: FigureColor.BLACK } },
+        { l: 1, c: 2, figure: { type: FigureType.STONE, color: FigureColor.BLACK } },
+        { l: 1, c: 4, figure: { type: FigureType.STONE, color: FigureColor.BLACK } },
+        { l: 1, c: 6, figure: { type: FigureType.STONE, color: FigureColor.BLACK } },
+        { l: 2, c: 1, figure: { type: FigureType.STONE, color: FigureColor.BLACK } },
+        { l: 2, c: 3, figure: { type: FigureType.STONE, color: FigureColor.BLACK } },
+        { l: 2, c: 5, figure: { type: FigureType.STONE, color: FigureColor.BLACK } },
+        { l: 2, c: 7, figure: { type: FigureType.STONE, color: FigureColor.BLACK } },
+
+        { l: 7, c: 0, figure: { type: FigureType.STONE, color: FigureColor.WHITE } },
+        { l: 7, c: 2, figure: { type: FigureType.STONE, color: FigureColor.WHITE } },
+        { l: 7, c: 4, figure: { type: FigureType.STONE, color: FigureColor.WHITE } },
+        { l: 7, c: 6, figure: { type: FigureType.STONE, color: FigureColor.WHITE } },
+        { l: 6, c: 1, figure: { type: FigureType.STONE, color: FigureColor.WHITE } },
+        { l: 6, c: 3, figure: { type: FigureType.STONE, color: FigureColor.WHITE } },
+        { l: 6, c: 5, figure: { type: FigureType.STONE, color: FigureColor.WHITE } },
+        { l: 6, c: 7, figure: { type: FigureType.STONE, color: FigureColor.WHITE } },
+        { l: 5, c: 0, figure: { type: FigureType.STONE, color: FigureColor.WHITE } },
+        { l: 5, c: 2, figure: { type: FigureType.STONE, color: FigureColor.WHITE } },
+        { l: 5, c: 4, figure: { type: FigureType.STONE, color: FigureColor.WHITE } },
+        { l: 5, c: 6, figure: { type: FigureType.STONE, color: FigureColor.WHITE } },
+    ];
+
     // parameters of board graphic
-    cellBorderSize = 7;
-    cellSize = 101; // [0..101]
+    cellSize = 100; // size of board field
+    startPoint = this.cellSize; // offset of the first cell
 
-    cellOffset = (this.cellBorderSize - 1) / 2;
-    cellInnerSize = this.cellSize - this.cellOffset * 2;
+    totalSize = this.cellSize * 8 + this.startPoint * 2; // total board size
+    cellCenter = this.cellSize / 2; // offset of cell center
 
-    cellCenter = (this.cellSize - 1) / 2; // [0..(50)..101]
+    stoneRadius = 40;
 
-    borderSize = this.cellCenter; // border around the field = half of 1 cell size
-    borderInnerSize = 10;
-    totalSize = this.cellSize * 8 + this.borderSize * 2;
-    startPoint = this.borderSize;
+    borderLine = 4;
+    borderWidth = 15;
+    cornerSize = this.startPoint / 3;
+
+    b1 = this.borderLine / 2;
+    b1s = this.totalSize - this.borderLine;
+    b2 = this.borderWidth;
+    b2s = this.totalSize - this.borderWidth * 2;
+
+    b3 = this.startPoint - this.borderWidth;
+    b3s = this.cellSize * 8 + this.borderWidth * 2;
+    b4 = this.startPoint - this.borderLine / 2;
+    b4s = this.cellSize * 8 + this.borderLine;
+
+    con00 = this.b1;
+    con01 = this.b2;
+    con10 = this.totalSize - this.cornerSize - this.borderLine / 2;
+    con11 = this.totalSize - this.cornerSize - this.borderWidth;
 
     vb = `0 0 ${this.totalSize} ${this.totalSize}`;
+
+    boardIndex = [0, 1, 2, 3, 4, 5, 6, 7];
 
     // the board sate
     static emptyActivationMatrix: boolean[][] = [

@@ -1,5 +1,9 @@
 export class ClassCastException {
-    constructor(readonly message: string) {}
+    public readonly message: string;
+
+    constructor(message: string) {
+        this.message = message;
+    }
 }
 
 export interface GameMessage {

@@ -1,51 +1,50 @@
 .board {
-    $board-border-color: #2d2004;
-    $board-dark-color: #573e07;
-    $board-light-color: #ffd67e;
-    $board-letters-color: #2d2307;
-    $board-letters-fill: #ffd67e;
-    $border-cell-highlight-color: #ff4800;
+    $light-color: #ffe4ae;
+    $lighter-color: #fff6e2;
 
-    $cell-border-size: 7;
+    $dark-color: #573e07;
+    $darker-color: #2d2004;
+
+    $line-width: 4;
+
+    $board-border-color: $darker-color;
+    $board-dark-color: $dark-color;
+    $board-light-color: $light-color;
+    $board-letters-color: $darker-color;
+    $board-letters-fill: $light-color;
+    $border-cell-highlight-color: #ff4800;
 
     .border {
         stroke: $board-border-color;
-        stroke-width: 4;
+        stroke-width: $line-width;
         stroke-linecap: round;
-        fill: #fff4d8;
+        fill: $lighter-color;
     }
 
     .coordinate {
         alignment-baseline: middle;
+        text-anchor: middle;
         stroke: $board-letters-color;
         fill: $board-letters-fill;
     }
 
     .cell {
-        stroke-width: $cell-border-size;
-
         &.light {
             fill: $board-light-color;
-            stroke: $board-light-color;
-            &:hover {
-                stroke: $border-cell-highlight-color;
-            }
-            &.active {
-                fill: #ffc23f;
-                stroke: #ff804b;
-            }
         }
-
         &.dark {
             fill: $board-dark-color;
-            stroke: $board-dark-color;
-            &:hover {
-                stroke: $border-cell-highlight-color;
-            }
-            &.active {
-                fill: #71582a;
-                stroke: #ff804b;
-            }
+        }
+    }
+
+    .shashka {
+        stroke-width: $line-width;
+        stroke: $board-light-color;
+        &.white {
+            fill: $lighter-color;
+        }
+        &.black {
+            fill: $darker-color;
         }
     }
 }

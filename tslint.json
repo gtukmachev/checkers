@@ -13,8 +13,7 @@
         "component-class-suffix": true,
         "directive-class-suffix": true,
         "typedef": [true, "call-signature"],
-        "no-console": {
-            "severity": "warning"
-        }
+        "no-console": false,
+        "no-empty-interface": false
     }
 }
