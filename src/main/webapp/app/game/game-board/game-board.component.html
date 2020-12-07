@@ -21,25 +21,25 @@
     </g>
 
     <g>
-        <text *ngFor="let l of boardIndex;"  class="coordinate" font-size="32"
+        <text *ngFor="let l of boardIndex;"  class="coordinate"
               [attr.x]="startPoint/2"
               [attr.y]="startPoint + (l*cellSize) + cellCenter"
         >{{8-l}}</text>
     </g>
     <g>
-        <text *ngFor="let l of boardIndex;"  class="coordinate" font-size="32"
+        <text *ngFor="let l of boardIndex;"  class="coordinate"
               [attr.x]="startPoint + (8*cellSize) + startPoint/2"
               [attr.y]="startPoint + (l*cellSize) + cellCenter"
         >{{8-l}}</text>
     </g>
     <g>
-        <text *ngFor="let c of boardIndex;" class="coordinate" font-size="32"
+        <text *ngFor="let c of boardIndex;" class="coordinate"
               [attr.x]="startPoint + (c*cellSize) + cellCenter"
               [attr.y]="startPoint/2"
         >{{colChar[c]}}</text>
     </g>
     <g>
-        <text *ngFor="let c of boardIndex;" class="coordinate" font-size="32"
+        <text *ngFor="let c of boardIndex;" class="coordinate"
               [attr.x]="startPoint + (c*cellSize) + cellCenter"
               [attr.y]="startPoint + (8*cellSize) + startPoint/2"
         >{{colChar[c]}}</text>

@@ -3,7 +3,7 @@
     $lighter-color: #fff6e2;
 
     $dark-color: #573e07;
-    $darker-color: #2d2004;
+    $darker-color: #221803;
 
     $line-width: 4;
 
@@ -26,6 +26,7 @@
         text-anchor: middle;
         stroke: $board-letters-color;
         fill: $board-letters-fill;
+        font-size: 50px;
     }
 
     .cell {
