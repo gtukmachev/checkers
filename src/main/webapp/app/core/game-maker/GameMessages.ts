@@ -33,6 +33,14 @@ export interface Figure {
     readonly color: FigureColor;
 }
 
+export interface FigureOnBoard {
+    l: number;
+    c: number;
+    isQuinn: boolean;
+    isActive: boolean;
+}
+export type AllFiguresOnBoard = Map<FigureColor, FigureOnBoard[]>;
+
 export const b: Figure = { type: FigureType.STONE, color: FigureColor.BLACK };
 export const w: Figure = { type: FigureType.STONE, color: FigureColor.WHITE };
 export const bq: Figure = { type: FigureType.QUINN, color: FigureColor.BLACK };

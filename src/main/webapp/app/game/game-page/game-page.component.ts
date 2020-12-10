@@ -1,7 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameMakerService } from 'app/core/game-maker/game-maker.service';
 import {
+    AllFiguresOnBoard,
     ClassCastException,
+    Figure,
+    FigureColor,
+    FigureOnBoard,
+    FigureType,
     GameInfo,
     GameMessage,
     GameState,
@@ -29,10 +34,12 @@ export class GamePageComponent implements OnInit, OnDestroy {
     public history: GameState[] = [];
     public me: PlayerInfo | null = null;
     public players: PlayerInfo[] = [];
+    public opponent: PlayerInfo | null = null;
 
     public colChar: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
     private gameSubscription?: Subscription;
+    public figures: AllFiguresOnBoard = new Map();
 
     constructor(private gameMakerService: GameMakerService) {}
 
@@ -44,7 +51,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.gameSubscription?.unsubscribe();
     }
 
-    private onGameMessage(msg: GameMessage) {
+    private onGameMessage(msg: GameMessage): void {
         console.log('onGameMessage:', msg);
         switch (msg.msgType) {
             case 'GameStatus':
@@ -61,38 +68,49 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 break;
             default:
                 throw new ClassCastException(
-                    `Type of inner object ${msg.msgType} is unrecognized! Supported types are: [GameStatus, ItIsNotYourStepError, WaitingForAGame, GameInfo]`
+                    `Type of inner object "${msg.msgType}" is unrecognized! Supported types are: [GameStatus, ItIsNotYourStepError, WaitingForAGame, GameInfo]`
                 );
         }
     }
 
-    private onMsg_GameStatus(gameStatusMsg: GameStatus) {
+    private onMsg_GameStatus(gameStatusMsg: GameStatus): void {
         this.currentState = gameStatusMsg.currentState;
         this.history = gameStatusMsg.history;
+
+        this.figures = this.loadFigures(this.currentState.field);
     }
 
-    private onMsg_GameInfo(gameInfoMsg: GameInfo) {
+    private onMsg_GameInfo(gameInfoMsg: GameInfo): void {
         this.gameId = gameInfoMsg.gameId;
         this.me = gameInfoMsg.you;
         this.players = gameInfoMsg.players;
         this.onMsg_GameStatus(gameInfoMsg.gameStatus);
+        if (this.players[0].index === this.me.index) {
+            this.opponent = this.players[1];
+        } else {
+            this.opponent = this.players[0];
+        }
     }
 
-    private onMsg_ItIsNotYourStepError(itIsNotYourStepError: ItIsNotYourStepError) {
+    private onMsg_ItIsNotYourStepError(itIsNotYourStepError: ItIsNotYourStepError): void {
+        console.trace('onMsg_ItIsNotYourStepError():', itIsNotYourStepError);
+
         // This means - my current state is broken.
         // Probably, due some connection issues and loosing a number of income messages
         // Request the current state of the game from the server (the answer will be handled via the onMsg_GameInfo() method:
         this.gameMakerService.updateGameStateRequest();
     }
 
-    private onMsg_WaitingForAGame(waitingForAGame: WaitingForAGame) {}
+    private onMsg_WaitingForAGame(waitingForAGame: WaitingForAGame): void {
+        console.trace('onMsg_WaitingForAGame():', waitingForAGame);
+    }
 
-    startGameRequest() {
+    startGameRequest(): void {
         this.gameMakerService.findGame();
     }
 
-    sendStepToServer(cellsQueue: P[]) {
-        console.log('sendStepToServer: [' + cellsQueue.map(p => `{l:${p.l}, c:${p.c}}`).join(', ') + ']');
+    sendStepToServer(cellsQueue: P[]): void {
+        console.log('sendStepToServer:', cellsQueue);
         const step: IStep = {
             nTurn: this.currentState.nTurn,
             cellsQueue: cellsQueue,
@@ -100,7 +118,29 @@ export class GamePageComponent implements OnInit, OnDestroy {
         this.gameMakerService.sendStep(step);
     }
 
-    clearLog() {
-        this.incomeMessages = [];
+    private loadFigures(field: (Figure | null)[][]): AllFiguresOnBoard {
+        let fs = new Map<FigureColor, FigureOnBoard[]>();
+        let black: FigureOnBoard[] = [];
+        let white: FigureOnBoard[] = [];
+
+        fs.set(FigureColor.WHITE, white);
+        fs.set(FigureColor.BLACK, black);
+
+        field?.forEach((row, l) => {
+            row?.forEach((figure, c) => {
+                switch (figure?.color) {
+                    case FigureColor.WHITE: {
+                        white.push({ l: l, c: c, isQuinn: figure?.type === FigureType.QUINN, isActive: false });
+                        break;
+                    }
+                    case FigureColor.BLACK: {
+                        black.push({ l: l, c: c, isQuinn: figure?.type === FigureType.QUINN, isActive: false });
+                        break;
+                    }
+                }
+            });
+        });
+
+        return fs;
     }
 }

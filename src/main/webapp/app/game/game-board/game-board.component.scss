@@ -5,6 +5,9 @@
     $dark-color: #573e07;
     $darker-color: #221803;
 
+    $primary-color: #ffa078;
+    $warning-color: #ff4800;
+
     $line-width: 4;
 
     $board-border-color: $darker-color;
@@ -12,7 +15,6 @@
     $board-light-color: $light-color;
     $board-letters-color: $darker-color;
     $board-letters-fill: $light-color;
-    $border-cell-highlight-color: #ff4800;
 
     .border {
         stroke: $board-border-color;
@@ -30,6 +32,12 @@
     }
 
     .cell {
+        &.active {
+            stroke: $warning-color;
+            stroke-width: $line-width;
+            fill: transparent;
+        }
+
         &.light {
             fill: $board-light-color;
         }
@@ -40,12 +48,37 @@
 
     .shashka {
         stroke-width: $line-width;
-        stroke: $board-light-color;
+
         &.white {
             fill: $lighter-color;
+            stroke: $darker-color;
+            &.active {
+                stroke: $warning-color;
+                &:hover {
+                    stroke: $warning-color;
+                }
+            }
+            &:hover {
+                stroke: $primary-color;
+            }
         }
         &.black {
             fill: $darker-color;
+            stroke: $lighter-color;
+            &.active {
+                stroke: $warning-color;
+                &:hover {
+                    stroke: $warning-color;
+                }
+            }
+            &:hover {
+                stroke: $primary-color;
+            }
         }
+    }
+
+    .move-arrow {
+        stroke-width: $line-width;
+        stroke: $primary-color;
     }
 }

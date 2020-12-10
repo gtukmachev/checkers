@@ -1,0 +1,8 @@
+<div class="alert" role="alert"
+     [ngClass]="{
+                    'alert-success': player?.index == activePlayerIndex,
+                    'alert-light': !(player?.index == activePlayerIndex)
+                 }"
+>
+    <span>{{player?.name}}</span>
+</div>

@@ -1,4 +1,6 @@
 <svg width="100%" [attr.viewBox]="vb" class="board">
+
+    <!-- aroind border -->
     <g>
         <rect [attr.x]="b1" [attr.y]="b1" [attr.width]="b1s" [attr.height]="b1s" class="border"></rect>
         <rect [attr.x]="b2" [attr.y]="b2" [attr.width]="b2s" [attr.height]="b2s" class="border"></rect>
@@ -20,32 +22,38 @@
         </g>
     </g>
 
+    <!-- coordinate lines -->
     <g>
-        <text *ngFor="let l of boardIndex;"  class="coordinate"
-              [attr.x]="startPoint/2"
-              [attr.y]="startPoint + (l*cellSize) + cellCenter"
-        >{{8-l}}</text>
-    </g>
-    <g>
-        <text *ngFor="let l of boardIndex;"  class="coordinate"
-              [attr.x]="startPoint + (8*cellSize) + startPoint/2"
-              [attr.y]="startPoint + (l*cellSize) + cellCenter"
-        >{{8-l}}</text>
-    </g>
-    <g>
-        <text *ngFor="let c of boardIndex;" class="coordinate"
-              [attr.x]="startPoint + (c*cellSize) + cellCenter"
-              [attr.y]="startPoint/2"
-        >{{colChar[c]}}</text>
-    </g>
-    <g>
-        <text *ngFor="let c of boardIndex;" class="coordinate"
-              [attr.x]="startPoint + (c*cellSize) + cellCenter"
-              [attr.y]="startPoint + (8*cellSize) + startPoint/2"
-        >{{colChar[c]}}</text>
+        <!-- line numbers -->
+        <g>
+            <text *ngFor="let l of boardIndex;"  class="coordinate"
+                  [attr.x]="startPoint/2"
+                  [attr.y]="startPoint + (l*cellSize) + cellCenter"
+            >{{linChar[l]}}</text>
+        </g>
+        <g>
+            <text *ngFor="let l of boardIndex;"  class="coordinate"
+                  [attr.x]="startPoint + (8*cellSize) + startPoint/2"
+                  [attr.y]="startPoint + (l*cellSize) + cellCenter"
+            >{{linChar[l]}}</text>
+        </g>
+
+        <!-- column letters -->
+        <g>
+            <text *ngFor="let c of boardIndex;" class="coordinate"
+                  [attr.x]="startPoint + (c*cellSize) + cellCenter"
+                  [attr.y]="startPoint/2"
+            >{{colChar[c]}}</text>
+        </g>
+        <g>
+            <text *ngFor="let c of boardIndex;" class="coordinate"
+                  [attr.x]="startPoint + (c*cellSize) + cellCenter"
+                  [attr.y]="startPoint + (8*cellSize) + startPoint/2"
+            >{{colChar[c]}}</text>
+        </g>
     </g>
 
-
+    <!-- board: dark / light squares -->
     <g *ngFor="let l of boardIndex;">
         <rect *ngFor="let c of boardIndex;"
               class="cell"
@@ -57,17 +65,65 @@
               [attr.y]="startPoint + l * cellSize"
               [attr.width]="cellSize"
               [attr.height]="cellSize"
+              (click)="cellClick(l,c)"
         ></rect>
     </g>
 
-    <circle *ngFor="let f of figures;"
-            [attr.cx]="startPoint + f.c * cellSize + cellCenter"
-            [attr.cy]="startPoint + f.l * cellSize + cellCenter"
+    <!--  black figures  -->
+    <g *ngFor="let f of (figures.get(this.FigureColor_BLACK));">
+        <circle
+            [attr.cx]="itemStartPoint + f.c * itemCellSize"
+            [attr.cy]="itemStartPoint + f.l * itemCellSize"
             [attr.r]="stoneRadius"
-            class="shashka"
-            [ngClass]="{
-                        black: f.figure.color == FigureColor_BLACK,
-                        white: f.figure.color == FigureColor_WHITE
-                    }"
-    ></circle>
+            class="shashka black"
+            [ngClass]="{active: f.isActive}"
+            (click)="clickToShaka(f)"
+        ></circle>
+        <circle *ngIf="f.isQuinn"
+                [attr.cx]="itemStartPoint + f.c * itemCellSize"
+                [attr.cy]="itemStartPoint + f.l * itemCellSize"
+                [attr.r]="stoneRadius/2"
+                class="shashka black quinn"
+                (click)="clickToShaka(f)"
+        ></circle>
+    </g>
+
+    <!--  white figures  -->
+    <g *ngFor="let f of (figures.get(this.FigureColor_WHITE));">
+        <circle
+                [attr.cx]="itemStartPoint + f.c * itemCellSize"
+                [attr.cy]="itemStartPoint + f.l * itemCellSize"
+                [attr.r]="stoneRadius"
+                class="shashka white"
+                [ngClass]="{active: f.isActive}"
+                (click)="clickToShaka(f)"
+        ></circle>
+        <circle *ngIf="f.isQuinn"
+                [attr.cx]="itemStartPoint + f.c * itemCellSize"
+                [attr.cy]="itemStartPoint + f.l * itemCellSize"
+                [attr.r]="stoneRadius/2"
+                class="shashka white quinn"
+                (click)="clickToShaka(f)"
+        ></circle>
+    </g>
+
+    <!-- move path visualization -->
+    <g *ngFor="let cell of cellsQueue; let i = index;">
+        <rect *ngIf="i > 0"
+              class="cell active"
+              [attr.x]="startPoint + cell.c * cellSize"
+              [attr.y]="startPoint + cell.l * cellSize"
+              [attr.width]="cellSize"
+              [attr.height]="cellSize"
+              (click)="cellClick(cell.l, cell.c)"
+        ></rect>
+        <line *ngIf="i > 0"
+              [attr.x1]="startPoint + cellsQueue[i-1].c * cellSize + cellCenter"
+              [attr.y1]="startPoint + cellsQueue[i-1].l * cellSize + cellCenter"
+              [attr.x2]="startPoint + cell.c * cellSize + cellCenter"
+              [attr.y2]="startPoint + cell.l * cellSize + cellCenter"
+              class="move-arrow"
+        ></line>
+    </g>
+
 </svg>

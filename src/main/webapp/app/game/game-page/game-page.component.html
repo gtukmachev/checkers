@@ -16,10 +16,19 @@
                 offset-lg-1 col-lg-7
                 offset-md-1 col-md-9
                 col-sm-12
+                col-sm-12
             ">
-                <jhi-game-board [field]="currentState.field"
-                                (doMove)="sendStepToServer($event)"
-                ></jhi-game-board>
+                <div class="row"><div class="col text-center">
+                    <jhi-game-board-user-panel [player]="opponent" [activePlayerIndex]="currentState.activePlayer"></jhi-game-board-user-panel>
+                </div></div>
+                <div class="row"><div class="col">
+                        <jhi-game-board [figures]="figures" [myColor]="me?.color"
+                                        (doMove)="sendStepToServer($event)"
+                        ></jhi-game-board>
+                </div></div>
+                <div class="row"><div class="col text-center">
+                    <jhi-game-board-user-panel [player]="me" [activePlayerIndex]="currentState.activePlayer"></jhi-game-board-user-panel>
+                </div></div>
             </div>
         </div>
     </div>

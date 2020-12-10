@@ -1,20 +1,22 @@
-import {Injectable} from '@angular/core';
-import {StompRService} from '@stomp/ng2-stompjs';
+import { Injectable } from '@angular/core';
+import { StompRService } from '@stomp/ng2-stompjs';
 import * as SockJS from 'sockjs-client';
-import {AuthServerProvider} from '../auth/auth-jwt.service';
-import {Location} from '@angular/common';
-import {Observable} from 'rxjs';
-import {IMessage} from '@stomp/stompjs';
-import {map} from 'rxjs/operators';
-import {GameMessage} from 'app/core/game-maker/GameMessages';
-import {IStep} from 'app/core/game-maker/IStep';
+import { AuthServerProvider } from '../auth/auth-jwt.service';
+import { Location } from '@angular/common';
+import { Observable } from 'rxjs';
+import { IMessage } from '@stomp/stompjs';
+import { map } from 'rxjs/operators';
+import { GameMessage } from 'app/core/game-maker/GameMessages';
+import { IStep } from 'app/core/game-maker/IStep';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameMakerService {
+    private _userGameChannel: Observable<GameMessage> | null = null;
+
     constructor(private stompService: StompRService, private authServerProvider: AuthServerProvider, private location: Location) {
-        //this.subscribeToUserGameChannel();
+        // this.subscribeToUserGameChannel();
     }
 
     /**
@@ -33,7 +35,7 @@ export class GameMakerService {
      * }
      *
      */
-    public findGame() {
+    public findGame(): void {
         this.getConnectedStompService().publish('/queue/new-game');
     }
 
@@ -41,7 +43,7 @@ export class GameMakerService {
      * A player should call this method in order to send his step to game server
      * @param step: IStep
      */
-    public sendStep(step: IStep) {
+    public sendStep(step: IStep): void {
         const msg = JSON.stringify(step);
         this.getConnectedStompService().publish(`/queue/steps`, msg);
     }
@@ -56,11 +58,10 @@ export class GameMakerService {
      * </p>
      * <p> But, if state is broken for some reason - we can use this function </p>
      */
-    public updateGameStateRequest(){
-        this.getConnectedStompService().publish("/queue/state");
+    public updateGameStateRequest(): void {
+        this.getConnectedStompService().publish('/queue/state');
     }
 
-    private _userGameChannel: Observable<GameMessage> | null = null;
     get userGameChannel(): Observable<GameMessage> {
         if (this._userGameChannel == null) {
             this._userGameChannel = this.getConnectedStompService()
@@ -86,7 +87,7 @@ export class GameMakerService {
         return this.stompService;
     }
 
-    private tryToConnect() {
+    private tryToConnect(): void {
         if (this.stompService.active) return;
 
         let url: string = this.buildWebSocketUrl();

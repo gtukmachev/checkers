@@ -11,96 +11,107 @@ import { TrackerActivity } from './tracker-activity.model';
 
 @Injectable({ providedIn: 'root' })
 export class TrackerService {
-  private stompClient: Stomp.Client | null = null;
-  private routerSubscription: Subscription | null = null;
-  private connectionSubject: ReplaySubject<void> = new ReplaySubject(1);
-  private connectionSubscription: Subscription | null = null;
-  private stompSubscription: Stomp.Subscription | null = null;
-  private listenerSubject: Subject<TrackerActivity> = new Subject();
+    private isTrackingEnabled = false;
 
-  constructor(private router: Router, private authServerProvider: AuthServerProvider, private location: Location) {}
+    private stompClient: Stomp.Client | null = null;
+    private routerSubscription: Subscription | null = null;
+    private connectionSubject: ReplaySubject<void> = new ReplaySubject(1);
+    private connectionSubscription: Subscription | null = null;
+    private stompSubscription: Stomp.Subscription | null = null;
+    private listenerSubject: Subject<TrackerActivity> = new Subject();
 
-  connect(): void {
-    if (this.stompClient && this.stompClient.connected) {
-      return;
-    }
+    constructor(private router: Router, private authServerProvider: AuthServerProvider, private location: Location) {}
 
-    // building absolute path so that websocket doesn't fail when deploying with a context path
-    let url = '/websocket/tracker';
-    url = this.location.prepareExternalUrl(url);
-    const authToken = this.authServerProvider.getToken();
-    if (authToken) {
-      url += '?access_token=' + authToken;
-    }
-    const socket: WebSocket = new SockJS(url);
-    this.stompClient = Stomp.over(socket);
-    const headers: Stomp.ConnectionHeaders = {};
-    this.stompClient.connect(headers, () => {
-      this.connectionSubject.next();
+    connect(): void {
+        if (!this.isTrackingEnabled) return;
 
-      this.sendActivity();
+        if (this.stompClient && this.stompClient.connected) {
+            return;
+        }
 
-      this.routerSubscription = this.router.events
-        .pipe(filter((event: Event) => event instanceof NavigationEnd))
-        .subscribe(() => this.sendActivity());
-    });
-  }
+        // building absolute path so that websocket doesn't fail when deploying with a context path
+        let url = '/websocket/tracker';
+        url = this.location.prepareExternalUrl(url);
+        const authToken = this.authServerProvider.getToken();
+        if (authToken) {
+            url += '?access_token=' + authToken;
+        }
+        const socket: WebSocket = new SockJS(url);
+        this.stompClient = Stomp.over(socket);
+        const headers: Stomp.ConnectionHeaders = {};
+        this.stompClient.connect(headers, () => {
+            this.connectionSubject.next();
 
-  disconnect(): void {
-    this.unsubscribe();
+            this.sendActivity();
 
-    this.connectionSubject = new ReplaySubject(1);
-
-    if (this.routerSubscription) {
-      this.routerSubscription.unsubscribe();
-      this.routerSubscription = null;
-    }
-
-    if (this.stompClient) {
-      if (this.stompClient.connected) {
-        this.stompClient.disconnect();
-      }
-      this.stompClient = null;
-    }
-  }
-
-  receive(): Subject<TrackerActivity> {
-    return this.listenerSubject;
-  }
-
-  subscribe(): void {
-    if (this.connectionSubscription) {
-      return;
-    }
-
-    this.connectionSubscription = this.connectionSubject.subscribe(() => {
-      if (this.stompClient) {
-        this.stompSubscription = this.stompClient.subscribe('/topic/tracker', (data: Stomp.Message) => {
-          this.listenerSubject.next(JSON.parse(data.body));
+            this.routerSubscription = this.router.events
+                .pipe(filter((event: Event) => event instanceof NavigationEnd))
+                .subscribe(() => this.sendActivity());
         });
-      }
-    });
-  }
-
-  unsubscribe(): void {
-    if (this.stompSubscription) {
-      this.stompSubscription.unsubscribe();
-      this.stompSubscription = null;
     }
 
-    if (this.connectionSubscription) {
-      this.connectionSubscription.unsubscribe();
-      this.connectionSubscription = null;
-    }
-  }
+    disconnect(): void {
+        if (!this.isTrackingEnabled) return;
+        this.unsubscribe();
 
-  private sendActivity(): void {
-    if (this.stompClient && this.stompClient.connected) {
-      this.stompClient.send(
-        '/topic/activity', // destination
-        JSON.stringify({ page: this.router.routerState.snapshot.url }), // body
-        {} // header
-      );
+        this.connectionSubject = new ReplaySubject(1);
+
+        if (this.routerSubscription) {
+            this.routerSubscription.unsubscribe();
+            this.routerSubscription = null;
+        }
+
+        if (this.stompClient) {
+            if (this.stompClient.connected) {
+                this.stompClient.disconnect();
+            }
+            this.stompClient = null;
+        }
     }
-  }
+
+    receive(): Subject<TrackerActivity> {
+        return this.listenerSubject;
+    }
+
+    subscribe(): void {
+        if (!this.isTrackingEnabled) return;
+
+        if (this.connectionSubscription) {
+            return;
+        }
+
+        this.connectionSubscription = this.connectionSubject.subscribe(() => {
+            if (this.stompClient) {
+                this.stompSubscription = this.stompClient.subscribe('/topic/tracker', (data: Stomp.Message) => {
+                    this.listenerSubject.next(JSON.parse(data.body));
+                });
+            }
+        });
+    }
+
+    unsubscribe(): void {
+        if (!this.isTrackingEnabled) return;
+
+        if (this.stompSubscription) {
+            this.stompSubscription.unsubscribe();
+            this.stompSubscription = null;
+        }
+
+        if (this.connectionSubscription) {
+            this.connectionSubscription.unsubscribe();
+            this.connectionSubscription = null;
+        }
+    }
+
+    private sendActivity(): void {
+        if (!this.isTrackingEnabled) return;
+
+        if (this.stompClient && this.stompClient.connected) {
+            this.stompClient.send(
+                '/topic/activity', // destination
+                JSON.stringify({ page: this.router.routerState.snapshot.url }), // body
+                {} // header
+            );
+        }
+    }
 }

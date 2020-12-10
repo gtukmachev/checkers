@@ -29,10 +29,10 @@ data class GameState(
                 field = arrayOf(
                     arrayOf(w, o, w, o,wq, o, w, o),
                     arrayOf(o, w, o, w, o, w, o, w),
-                    arrayOf(w, o, w, o, w, o, w, o),
                     arrayOf(o, o, o, o, o, o, o, o),
                     arrayOf(o, o, o, o, o, o, o, o),
-                    arrayOf(o, b, o, b, o, b, o, b),
+                    arrayOf(o, o, o, o, o, o, o, o),
+                    arrayOf(o, o, o, o, o, o, o, o),
                     arrayOf(b, o, b, o, b, o, b, o),
                     arrayOf(o, b, o,bq, o, b, o, b),
                 )
