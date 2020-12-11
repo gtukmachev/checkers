@@ -72,16 +72,16 @@
     <!--  black figures  -->
     <g *ngFor="let f of (figures.get(this.FigureColor_BLACK));">
         <circle
-            [attr.cx]="itemStartPoint + f.c * itemCellSize"
-            [attr.cy]="itemStartPoint + f.l * itemCellSize"
+                [attr.cx]="fx0 + f.c * fxCellSize"
+                [attr.cy]="fy0 + f.l * fyCellSize"
             [attr.r]="stoneRadius"
             class="shashka black"
             [ngClass]="{active: f.isActive}"
             (click)="clickToShaka(f)"
         ></circle>
         <circle *ngIf="f.isQuinn"
-                [attr.cx]="itemStartPoint + f.c * itemCellSize"
-                [attr.cy]="itemStartPoint + f.l * itemCellSize"
+                [attr.cx]="fx0 + f.c * fxCellSize"
+                [attr.cy]="fy0 + f.l * fyCellSize"
                 [attr.r]="stoneRadius/2"
                 class="shashka black quinn"
                 (click)="clickToShaka(f)"
@@ -91,16 +91,16 @@
     <!--  white figures  -->
     <g *ngFor="let f of (figures.get(this.FigureColor_WHITE));">
         <circle
-                [attr.cx]="itemStartPoint + f.c * itemCellSize"
-                [attr.cy]="itemStartPoint + f.l * itemCellSize"
+                [attr.cx]="fx0 + f.c * fxCellSize"
+                [attr.cy]="fy0 + f.l * fyCellSize"
                 [attr.r]="stoneRadius"
                 class="shashka white"
                 [ngClass]="{active: f.isActive}"
                 (click)="clickToShaka(f)"
         ></circle>
         <circle *ngIf="f.isQuinn"
-                [attr.cx]="itemStartPoint + f.c * itemCellSize"
-                [attr.cy]="itemStartPoint + f.l * itemCellSize"
+                [attr.cx]="fx0 + f.c * fxCellSize"
+                [attr.cy]="fy0 + f.l * fyCellSize"
                 [attr.r]="stoneRadius/2"
                 class="shashka white quinn"
                 (click)="clickToShaka(f)"
@@ -111,17 +111,17 @@
     <g *ngFor="let cell of cellsQueue; let i = index;">
         <rect *ngIf="i > 0"
               class="cell active"
-              [attr.x]="startPoint + cell.c * cellSize"
-              [attr.y]="startPoint + cell.l * cellSize"
+              [attr.x]="fx0 + cell.c * fxCellSize - cellCenter"
+              [attr.y]="fy0 + cell.l * fyCellSize - cellCenter"
               [attr.width]="cellSize"
               [attr.height]="cellSize"
-              (click)="cellClick(cell.l, cell.c)"
+              (click)="activeCellClick(cell)"
         ></rect>
         <line *ngIf="i > 0"
-              [attr.x1]="startPoint + cellsQueue[i-1].c * cellSize + cellCenter"
-              [attr.y1]="startPoint + cellsQueue[i-1].l * cellSize + cellCenter"
-              [attr.x2]="startPoint + cell.c * cellSize + cellCenter"
-              [attr.y2]="startPoint + cell.l * cellSize + cellCenter"
+              [attr.x1]="fx0 + cellsQueue[i-1].c * fxCellSize"
+              [attr.y1]="fy0 + cellsQueue[i-1].l * fyCellSize"
+              [attr.x2]="fx0 + cell.c * fxCellSize"
+              [attr.y2]="fy0 + cell.l * fyCellSize"
               class="move-arrow"
         ></line>
     </g>

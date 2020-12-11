@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller
 import tga.checkers.exts.millis
 import tga.checkers.game.actors.GameRequest
 import tga.checkers.game.actors.NotifyPlayer
-import tga.checkers.game.actors.PlayerStep
+import tga.checkers.game.actors.PlayerMove
 import tga.checkers.game.actors.StatusRequest
 import java.security.Principal
 import java.util.concurrent.TimeUnit
@@ -55,11 +55,11 @@ class GameWebService(
     @MessageMapping("/queue/steps")
     fun stepFromPlayer(
                      principal: Principal,
-            @Payload      step: PlayerStep
+            @Payload      move: PlayerMove
     ) {
-        log.debug("@MessageMapping(\"/queue/steps\") => fromPlayer(principal={})", principal.name, step)
+        log.debug("@MessageMapping(\"/queue/steps\") => fromPlayer(principal={})", principal.name, move)
         val playerActor = findPlayerActor(principal.name)
-        playerActor?.tell(step, ActorRef.noSender())
+        playerActor?.tell(move, ActorRef.noSender())
     }
 
     @MessageMapping("/queue/state")

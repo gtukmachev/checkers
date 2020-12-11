@@ -1,6 +1,6 @@
 import { P } from 'app/core/game-maker/GameMessages';
 
-export interface IStep {
+export interface IMove {
     nTurn: number;
     cellsQueue: P[];
 }

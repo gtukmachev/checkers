@@ -2,6 +2,7 @@ package tga.checkers.game.actors
 
 import tga.checkers.game.FigureColor
 import tga.checkers.game.GameState
+import tga.checkers.game.P
 
 
 data class WebServiceOutcomeMessage(val gameId: Int, val msgType: String, val msg: ToPlayerMessage)
@@ -31,4 +32,8 @@ interface ToPlayerMessage
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 interface WebServiceIncomeMessage
-    data class PlayerStep(val lin: Int, val col: Int) : WebServiceIncomeMessage
+
+    data class PlayerMove(
+        val nTurn: Int,
+        val cellsQueue: List<P>
+    ) : WebServiceIncomeMessage

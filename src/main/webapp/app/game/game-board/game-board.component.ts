@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { AllFiguresOnBoard, FigureColor, FigureOnBoard, P } from 'app/core/game-maker/GameMessages';
 
 @Component({
@@ -6,9 +6,9 @@ import { AllFiguresOnBoard, FigureColor, FigureOnBoard, P } from 'app/core/game-
     templateUrl: './game-board.component.html',
     styleUrls: ['./game-board.component.scss'],
 })
-export class GameBoardComponent implements OnInit {
+export class GameBoardComponent implements OnInit, OnChanges {
     @Input() figures: AllFiguresOnBoard = new Map();
-    @Input() myColor?: FigureColor | null = null;
+    @Input() myColor?: FigureColor = FigureColor.WHITE;
     @Output() doMove: EventEmitter<P[]> = new EventEmitter<P[]>();
 
     FigureColor_WHITE = FigureColor.WHITE;
@@ -53,24 +53,37 @@ export class GameBoardComponent implements OnInit {
     itemStartPoint: number = 0;
     itemCellSize: number = 0;
 
-    public colChar: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+    fx0 = 0;
+    fy0 = 0;
+    fxCellSize = 0;
+    fyCellSize = 0;
+
+    public colChar: string[] = [];
     public linChar: string[] = [];
 
     constructor() {}
 
-    ngOnInit(): void {
-        if (this.myColor === FigureColor.WHITE) {
-            this.colChar = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-            this.linChar = ['8', '7', '6', '5', '4', '3', '2', '1'];
-            this.itemStartPoint = this.startPoint + this.cellSize * 9 - this.cellCenter;
-            this.itemCellSize = -this.cellSize;
-        } else {
-            this.colChar = ['H', 'G', 'F', 'E', 'D', 'C', 'B', 'A'];
-            this.linChar = ['1', '2', '3', '4', '5', '6', '7', '8'];
-            this.itemStartPoint = this.startPoint + this.cellCenter;
-            this.itemCellSize = this.cellSize;
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes.myColor) {
+            if (this.myColor === FigureColor.WHITE) {
+                this.colChar = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+                this.linChar = ['8', '7', '6', '5', '4', '3', '2', '1'];
+                this.fx0 = this.startPoint + this.cellCenter;
+                this.fy0 = this.startPoint + this.cellSize * 8 - this.cellCenter;
+                this.fxCellSize = this.cellSize;
+                this.fyCellSize = -this.cellSize;
+            } else {
+                this.colChar = ['H', 'G', 'F', 'E', 'D', 'C', 'B', 'A'];
+                this.linChar = ['1', '2', '3', '4', '5', '6', '7', '8'];
+                this.fx0 = this.startPoint + this.cellSize * 8 - this.cellCenter;
+                this.fy0 = this.startPoint + this.cellCenter;
+                this.fxCellSize = -this.cellSize;
+                this.fyCellSize = this.cellSize;
+            }
         }
     }
+
+    ngOnInit(): void {}
 
     clickToShaka(f: FigureOnBoard): void {
         if (this.cellsQueue.length < 2) {
@@ -85,16 +98,34 @@ export class GameBoardComponent implements OnInit {
     }
 
     cellClick(l: number, c: number): void {
+        this.handleCellClick(this.convertCoordinatesFromScreenToGameAxis(l, c));
+    }
+
+    activeCellClick(p: P): void {
+        this.handleCellClick(p);
+    }
+
+    private handleCellClick(p: P): void {
+        console.warn(`handleCellClick():`, p);
+
         if (!this.activeShashka) return;
 
         let last: P | null = null;
         if (this.cellsQueue.length > 0) last = this.cellsQueue[this.cellsQueue.length - 1];
 
-        if (last && l === last.l && c === last.c) {
+        if (last && p.l === last.l && p.c === last.c) {
             this.doMove.emit(this.cellsQueue);
             this.eraseState();
         } else {
-            this.cellsQueue.push({ l: l, c: c });
+            this.cellsQueue.push(p);
+        }
+    }
+
+    private convertCoordinatesFromScreenToGameAxis(l: number, c: number): P {
+        if (this.myColor === FigureColor.WHITE) {
+            return { l: 7 - l, c: c };
+        } else {
+            return { l: l, c: 7 - c };
         }
     }
 

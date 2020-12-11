@@ -50,8 +50,8 @@ class GameActor(
 
 
     private val waitingForStepsBehavior = ReceiveBuilder()
-            .on(PlayerStep::class, { sender == activePlayer.actor }){ onPlayerStep(it)              }
-            .on(PlayerStep::class                                  ){ onWrongPlayerStep(it, sender) }
+            .on(PlayerMove::class, { sender == activePlayer.actor }){ onPlayerMove(it)              }
+            .on(PlayerMove::class                                  ){ onWrongPlayerStep(it, sender) }
             .on(NotifyPlayer::class                                ){ onNotifyPlayer(it)            }
             .build()
 
@@ -88,12 +88,12 @@ class GameActor(
     }
 
 
-    private fun onPlayerStep(playerStep: PlayerStep) {
-        log().debug("onPlayerStep(playerStep={})", playerStep)
+    private fun onPlayerMove(playerMove: PlayerMove) {
+        log().debug("onPlayerMove(playerStep={})", playerMove)
         this.history = history + currentState        // save the current state to history. IMPORTANT: the list should be immutable - don't change it!
 
         // process the active player step
-        this.currentState = performPlayerStep(playerStep){
+        this.currentState = performPlayerStep(playerMove){
             // this callback will be invoked only and only if the current step is proceed without any errors
             switchActivePlayerToNextOne()
             activePlayer.index
@@ -105,17 +105,22 @@ class GameActor(
 
     }
 
-    private fun performPlayerStep(playerStep: PlayerStep, calculateNextPlayer: () -> Int): GameState {
-        log().debug("performPlayerStep({})", playerStep)
+    private fun performPlayerStep(playerMove: PlayerMove, calculateNextPlayer: () -> Int): GameState {
+        log().debug("performPlayerStep({})", playerMove)
         //TODO("Not yet implemented")
 
-        val step = Step(
-                start = P(playerStep.lin, playerStep.col),
+        val steps = mutableListOf<Step>()
+        for(i in 1 until playerMove.cellsQueue.size) {
+            val step = Step(
+                start = playerMove.cellsQueue[i-1],
                 shot = null,
                 shotFigure = null,
-                end = P(playerStep.lin + 1, playerStep.col + 1)
-        )
-        val move = Move(activePlayer.index, b, listOf(step), MoveStatus.OK)
+                end = playerMove.cellsQueue[i]
+            )
+            steps.add(step)
+        }
+
+        val move = Move(activePlayer.index, b, steps, MoveStatus.OK)
 
         val newActivePlayerIndex: Int = calculateNextPlayer()
         val newGameState = GameState(
@@ -152,8 +157,8 @@ class GameActor(
     }
 
 
-    private fun onWrongPlayerStep(playerStep: PlayerStep, wrongPlayerActor: ActorRef) {
-        log().debug("onWrongPlayerStep(playerStep={}, wrongPlayerActor={})", playerStep, wrongPlayerActor)
+    private fun onWrongPlayerStep(playerMove: PlayerMove, wrongPlayerActor: ActorRef) {
+        log().debug("onWrongPlayerStep(playerStep={}, wrongPlayerActor={})", playerMove, wrongPlayerActor)
         wrongPlayerActor.tell(ItIsNotYourStepError(), self)
 
     }

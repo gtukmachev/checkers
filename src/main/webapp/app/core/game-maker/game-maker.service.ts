@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 import { IMessage } from '@stomp/stompjs';
 import { map } from 'rxjs/operators';
 import { GameMessage } from 'app/core/game-maker/GameMessages';
-import { IStep } from 'app/core/game-maker/IStep';
+import { IMove } from 'app/core/game-maker/IMove';
 
 @Injectable({
     providedIn: 'root',
@@ -43,7 +43,7 @@ export class GameMakerService {
      * A player should call this method in order to send his step to game server
      * @param step: IStep
      */
-    public sendStep(step: IStep): void {
+    public sendStep(step: IMove): void {
         const msg = JSON.stringify(step);
         this.getConnectedStompService().publish(`/queue/steps`, msg);
     }

@@ -18,7 +18,7 @@ import {
     WaitingForAGame,
 } from 'app/core/game-maker/GameMessages';
 import { Subscription } from 'rxjs';
-import { IStep } from 'app/core/game-maker/IStep';
+import { IMove } from 'app/core/game-maker/IMove';
 
 @Component({
     selector: 'jhi-game-page',
@@ -39,7 +39,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     public colChar: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 
     private gameSubscription?: Subscription;
-    public figures: AllFiguresOnBoard = new Map();
+    public figures: AllFiguresOnBoard = new Map<FigureColor, FigureOnBoard[]>();
 
     constructor(private gameMakerService: GameMakerService) {}
 
@@ -54,6 +54,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
     private onGameMessage(msg: GameMessage): void {
         console.log('onGameMessage:', msg);
         switch (msg.msgType) {
+            case 'GameState':
+                this.onMsg_GameState(msg.msg as GameState);
+                break;
             case 'GameStatus':
                 this.onMsg_GameStatus(msg.msg as GameStatus);
                 break;
@@ -68,9 +71,16 @@ export class GamePageComponent implements OnInit, OnDestroy {
                 break;
             default:
                 throw new ClassCastException(
-                    `Type of inner object "${msg.msgType}" is unrecognized! Supported types are: [GameStatus, ItIsNotYourStepError, WaitingForAGame, GameInfo]`
+                    `The type "${msg.msgType}" is unrecognized! Supported types are: [GameState, GameStatus, ItIsNotYourStepError, WaitingForAGame, GameInfo]`
                 );
         }
+    }
+
+    private onMsg_GameState(gameState: GameState): void {
+        this.history.push(this.currentState);
+        this.currentState = gameState;
+
+        this.figures = this.loadFigures(this.currentState.field);
     }
 
     private onMsg_GameStatus(gameStatusMsg: GameStatus): void {
@@ -105,19 +115,6 @@ export class GamePageComponent implements OnInit, OnDestroy {
         console.trace('onMsg_WaitingForAGame():', waitingForAGame);
     }
 
-    startGameRequest(): void {
-        this.gameMakerService.findGame();
-    }
-
-    sendStepToServer(cellsQueue: P[]): void {
-        console.log('sendStepToServer:', cellsQueue);
-        const step: IStep = {
-            nTurn: this.currentState.nTurn,
-            cellsQueue: cellsQueue,
-        };
-        this.gameMakerService.sendStep(step);
-    }
-
     private loadFigures(field: (Figure | null)[][]): AllFiguresOnBoard {
         let fs = new Map<FigureColor, FigureOnBoard[]>();
         let black: FigureOnBoard[] = [];
@@ -142,5 +139,18 @@ export class GamePageComponent implements OnInit, OnDestroy {
         });
 
         return fs;
+    }
+
+    startGameRequest(): void {
+        this.gameMakerService.findGame();
+    }
+
+    sendStepToServer(cellsQueue: P[]): void {
+        console.log('sendStepToServer:', cellsQueue);
+        const step: IMove = {
+            nTurn: this.currentState.nTurn,
+            cellsQueue: cellsQueue,
+        };
+        this.gameMakerService.sendStep(step);
     }
 }
