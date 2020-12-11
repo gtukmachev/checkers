@@ -109,28 +109,50 @@ class GameActor(
         log().debug("performPlayerStep({})", playerMove)
         //TODO("Not yet implemented")
 
+        var figure: Figure? = null
         val steps = mutableListOf<Step>()
-        for(i in 1 until playerMove.cellsQueue.size) {
-            val step = Step(
-                start = playerMove.cellsQueue[i-1],
-                shot = null,
-                shotFigure = null,
-                end = playerMove.cellsQueue[i]
-            )
-            steps.add(step)
+
+        for(i in 0 until playerMove.cellsQueue.size) {
+            when (i) {
+                0 -> {
+                    val p = playerMove.cellsQueue[i]
+                    figure = currentState.field[p.l][p.c]
+                }
+                else -> {
+                    val step = Step(
+                        start = playerMove.cellsQueue[i-1],
+                        shot = null,
+                        shotFigure = null,
+                        end = playerMove.cellsQueue[i]
+                    )
+                    steps.add(step)
+                }
+            }
         }
 
-        val move = Move(activePlayer.index, b, steps, MoveStatus.OK)
+        val move = Move(activePlayer.index, figure!!, steps, MoveStatus.OK)
 
         val newActivePlayerIndex: Int = calculateNextPlayer()
         val newGameState = GameState(
                 nTurn = currentState.nTurn + 1,
                 activePlayer = newActivePlayerIndex,
                 lastMove = move,
-                field = currentState.field
+                field = applyStep(currentState.field, steps[0])
         )
 
         return newGameState
+    }
+
+    private fun applyStep(field: Array<Array<Figure?>>, step: Step): Array<Array<Figure?>> {
+        val newField: Array<Array<Figure?>> = Array(field.size){ field[it].copyOf() }
+
+        val f = newField[step.start.l][step.start.c]
+        if (f != null) {
+            newField[step.start.l][step.start.c] = null
+            newField[step.end.l][step.end.c] = f
+        }
+
+        return newField
     }
 
 
