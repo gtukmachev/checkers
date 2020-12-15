@@ -1,39 +1,44 @@
 package tga.checkers.game.actors
 
-import tga.checkers.game.FigureColor
-import tga.checkers.game.GameState
-import tga.checkers.game.P
+import tga.checkers.game.*
 
 
 data class WebServiceOutcomeMessage(val gameId: Int, val msgType: String, val msg: ToPlayerMessage)
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 interface ToPlayerMessage
 
     object WaitingForAGame : ToPlayerMessage
 
-    class ItIsNotYourStepError: ToPlayerMessage
+    class ItIsNotYourStepError : ToPlayerMessage
 
     data class GameInfo(
-            val gameId: Int,
-            val you: PlayerInfo,
-            val players: Collection<PlayerInfo>,
-            val gameStatus: GameStatus
-            ) : ToPlayerMessage
+        val gameId: Int,
+        val players: Collection<PlayerInfo>,
+        val you: Int,
+        val board: Board,
+        val history: GameHistory
+    ) : ToPlayerMessage
 
     data class PlayerInfo(
-            val name: String,
-            val index: Int,
-            val color: FigureColor,
+        val index: Int,
+        val name: String,
+        val color: FigureColor = colorOfPlayerByIndex(index),
     )
 
-    data class GameStatus(
-            val currentState: GameState,
-            val history: List<GameState> ) : ToPlayerMessage
+    data class NextMoveInfo(
+        val newBoard: Board,
+        val lastMove: PlayerMove
+    )
+
+    data class WrongMoveError(
+        val move: BoardHistoryItem
+    )
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 interface WebServiceIncomeMessage
 
-    data class PlayerMove(
-        val nTurn: Int,
+    data class PlayerMoveInfo(
+        val turn: Int,
         val cellsQueue: List<P>
     ) : WebServiceIncomeMessage
