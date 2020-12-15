@@ -6,32 +6,36 @@ export class ClassCastException {
     }
 }
 
-export interface GameMessage {
-    readonly gameId: number;
-    readonly msgType: string;
-    readonly msg: GameInfo | GameStatus | ItIsNotYourStepError | WaitingForAGame;
-}
-
 export enum FigureType {
     STONE = 'STONE',
     QUINN = 'QUINN',
     EMPTY = '',
 }
+
 export enum FigureColor {
     BLACK = 'BLACK',
     WHITE = 'WHITE',
     EMPTY = '',
 }
+
 export enum MoveStatus {
     OK = 'OK',
     EMPTY = '',
     ERROR = 'ERROR',
 }
 
+export interface GameMessage {
+    readonly gameId: number;
+    readonly msgType: string;
+    readonly msg: GameInfo | GameStatus | ItIsNotYourStepError | WaitingForAGame;
+}
+
 export interface Figure {
     readonly type: FigureType;
     readonly color: FigureColor;
 }
+
+export const NO_FIGURE: Figure = { type: FigureType.EMPTY, color: FigureColor.EMPTY };
 
 export interface FigureOnBoard {
     l: number;
@@ -40,12 +44,6 @@ export interface FigureOnBoard {
     isActive: boolean;
 }
 export type AllFiguresOnBoard = Map<FigureColor, FigureOnBoard[]>;
-
-export const b: Figure = { type: FigureType.STONE, color: FigureColor.BLACK };
-export const w: Figure = { type: FigureType.STONE, color: FigureColor.WHITE };
-export const bq: Figure = { type: FigureType.QUINN, color: FigureColor.BLACK };
-export const wq: Figure = { type: FigureType.QUINN, color: FigureColor.WHITE };
-export const o: Figure | null = null;
 
 export interface ItIsNotYourStepError {}
 
@@ -69,36 +67,107 @@ export interface PlayerInfo {
     readonly color: FigureColor;
 }
 
-export interface GameState {
-    readonly nTurn: number;
-    readonly activePlayer: number;
-    readonly lastMove: Move | null;
-    readonly field: (Figure | null)[][];
-}
-
-export function initialGameState(): GameState {
-    return {
-        nTurn: 0,
-        activePlayer: 0,
-        lastMove: null,
-        field: [
-            [w, o, w, o, wq, o, w, o],
-            [o, w, o, w, o, w, o, w],
-            [w, o, w, o, w, o, w, o],
-            [o, o, o, o, o, o, o, o],
-            [o, o, o, o, o, o, o, o],
-            [o, b, o, b, o, b, o, b],
-            [b, o, b, o, b, o, b, o],
-            [o, b, o, bq, o, b, o, b],
-        ],
-    };
-}
-
 export interface Move {
     readonly player: number;
     readonly figure: Figure;
     readonly steps: Step[];
     readonly status: MoveStatus;
+}
+
+export const NO_MOVE: Move = { player: -1, steps: [], figure: NO_FIGURE, status: MoveStatus.EMPTY };
+
+export interface GameState {
+    readonly turn: number;
+    readonly activePlayer: number;
+    readonly lastMove: Move;
+    readonly field: Field;
+}
+
+export interface Field {
+    desk: (Figure | null)[];
+}
+
+export const b: Figure = { type: FigureType.STONE, color: FigureColor.BLACK };
+export const w: Figure = { type: FigureType.STONE, color: FigureColor.WHITE };
+export const bq: Figure = { type: FigureType.QUINN, color: FigureColor.BLACK };
+export const wq: Figure = { type: FigureType.QUINN, color: FigureColor.WHITE };
+export const o: Figure | null = null;
+
+export function initialGameState(): GameState {
+    return {
+        turn: 0,
+        activePlayer: 0,
+        lastMove: NO_MOVE,
+        field: {
+            desk: [
+                // A  B  C  D  E  F  G  H
+                w,
+                o,
+                w,
+                o,
+                w,
+                o,
+                w,
+                o, // 1
+                o,
+                w,
+                o,
+                w,
+                o,
+                w,
+                o,
+                w, // 2
+                w,
+                o,
+                w,
+                o,
+                w,
+                o,
+                w,
+                o, // 3
+                o,
+                o,
+                o,
+                o,
+                o,
+                o,
+                o,
+                o, // 4
+                o,
+                o,
+                o,
+                o,
+                o,
+                o,
+                o,
+                o, // 5
+                o,
+                b,
+                o,
+                b,
+                o,
+                b,
+                o,
+                b, // 6
+                b,
+                o,
+                b,
+                o,
+                b,
+                o,
+                b,
+                o, // 7
+                o,
+                b,
+                o,
+                b,
+                o,
+                b,
+                o,
+                b, // 8
+            ],
+        },
+    };
 }
 
 export interface Step {

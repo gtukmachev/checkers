@@ -3,7 +3,7 @@ import { GameMakerService } from 'app/core/game-maker/game-maker.service';
 import {
     AllFiguresOnBoard,
     ClassCastException,
-    Figure,
+    Field,
     FigureColor,
     FigureOnBoard,
     FigureType,
@@ -115,7 +115,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
         console.trace('onMsg_WaitingForAGame():', waitingForAGame);
     }
 
-    private loadFigures(field: (Figure | null)[][]): AllFiguresOnBoard {
+    private loadFigures(field: Field): AllFiguresOnBoard {
         let fs = new Map<FigureColor, FigureOnBoard[]>();
         let black: FigureOnBoard[] = [];
         let white: FigureOnBoard[] = [];
@@ -123,20 +123,24 @@ export class GamePageComponent implements OnInit, OnDestroy {
         fs.set(FigureColor.WHITE, white);
         fs.set(FigureColor.BLACK, black);
 
-        field?.forEach((row, l) => {
-            row?.forEach((figure, c) => {
+        let i = 0;
+        for (let l = 0; l < 8; l++) {
+            for (let c = 0; c < 8; c++) {
+                const figure = field.desk[i];
+                const f: FigureOnBoard = { l: l, c: c, isQuinn: figure?.type === FigureType.QUINN, isActive: false };
                 switch (figure?.color) {
                     case FigureColor.WHITE: {
-                        white.push({ l: l, c: c, isQuinn: figure?.type === FigureType.QUINN, isActive: false });
+                        white.push(f);
                         break;
                     }
                     case FigureColor.BLACK: {
-                        black.push({ l: l, c: c, isQuinn: figure?.type === FigureType.QUINN, isActive: false });
+                        black.push(f);
                         break;
                     }
                 }
-            });
-        });
+                i++;
+            }
+        }
 
         return fs;
     }
@@ -148,7 +152,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     sendStepToServer(cellsQueue: P[]): void {
         console.log('sendStepToServer:', cellsQueue);
         const step: IMove = {
-            nTurn: this.currentState.nTurn,
+            turn: this.currentState.turn,
             cellsQueue: cellsQueue,
         };
         this.gameMakerService.sendStep(step);

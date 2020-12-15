@@ -1,0 +1,14 @@
+{{state.turn}} :
+<span *ngIf="state.turn === 0">
+    first turn
+</span>
+<span *ngIf="state.turn > 0">
+    {{
+        state.lastMove!.figure.color === figureColorWhite ? "W" : "B"
+    }}{{
+        state.lastMove!.figure.type === figureTypeQuinn ? "Q" : "S"
+    }}
+    <span *ngFor="let step of state.lastMove!.steps">
+            {{step.start.l+1}}{{cols[step.start.c]}}-{{step.end.l+1}}{{cols[step.end.c]}}
+    </span>
+</span>

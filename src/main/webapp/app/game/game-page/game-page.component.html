@@ -12,11 +12,9 @@
         <div class="row">
 
             <div class="
-                offset-xl-1 col-xl-5
-                offset-lg-1 col-lg-7
-                offset-md-1 col-md-9
-                col-sm-12
-                col-sm-12
+                col-xl-5
+                col-lg-7
+                col-md-9
             ">
                 <div class="row"><div class="col text-center">
                     <jhi-game-board-user-panel [player]="opponent" [activePlayerIndex]="currentState.activePlayer"></jhi-game-board-user-panel>
@@ -29,6 +27,18 @@
                 <div class="row"><div class="col text-center">
                     <jhi-game-board-user-panel [player]="me" [activePlayerIndex]="currentState.activePlayer"></jhi-game-board-user-panel>
                 </div></div>
+            </div>
+            <div class="
+                    col-xl-5
+                    col-lg-5
+                    col-md-3
+            ">
+                <ul class="list-group">
+                    <li *ngFor="let historyItem of history; let i = index;" class="list-group-item list-group-item-action">
+                        <jhi-history-item [state] = "historyItem"></jhi-history-item>
+                    </li>
+                    <li *ngIf="currentState.turn > 0" class="list-group-item list-group-item-action"><jhi-history-item [state]="currentState"></jhi-history-item></li>
+                </ul>
             </div>
         </div>
     </div>
