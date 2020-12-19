@@ -70,8 +70,8 @@ class GamesMakerActor(
     private fun respondWithWaitingStatus(userName: String) {
         log().debug("respondWithWaitingStatus(userName={})", userName)
         val msg = WaitingForAGame
-        val gameMessage = WebServiceOutcomeMessage(-1, msg.javaClass.simpleName, msg)
-        websocket.convertAndSendToUser(userName, "/queue/game", gameMessage)
+        val webServiceOutcomeMessage = WebServiceOutcomeMessage(-1, msg.javaClass.simpleName, msg)
+        websocket.convertAndSendToUser(userName, "/queue/game", webServiceOutcomeMessage)
     }
 
     private fun tryToStartNewGame() {

@@ -5,6 +5,7 @@ enum class FigureColor{ WHITE, BLACK, BLUE, GREEN, CYAN }
 
 typealias PlayerIndex = Int
 typealias GameHistory = List<BoardHistoryItem>
+typealias FiguresByPlayers = Map<PlayerIndex, List<Figure>>
 
 fun colorOfPlayerByIndex(index: PlayerIndex): FigureColor = FigureColor.values()[index]
 
@@ -30,7 +31,7 @@ data class P(val l: Int, val c: Int) {
 data class Board(
     val turn: Int,
     val activePlayerIndex: PlayerIndex,
-    val figures: Map<PlayerIndex, List<Figure>>,
+    val figures: FiguresByPlayers
 ) {
     companion object {
         fun initialBoard(desk: Desk): Board = Board(
@@ -64,18 +65,15 @@ data class Desk(
     fun isOnDesk(p: P) = isOnDesk(p.l, p.c)
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    fun mapToFiguresByPlayers(): Map<PlayerIndex, List<Figure>> {
-        val pairsPlayerToFigure = figures.asSequence()
-            .mapIndexed { i, f ->
-                if (f == null) {
-                    null
-                } else {
-                    f.player to Figure(id = f.id, p = P(i, 8, 8), type = f.type)
-                }
-            }.filterNotNull()
-
-        return pairsPlayerToFigure.groupBy({it.first}, {it.second})
-
+    fun mapToFiguresByPlayers(): FiguresByPlayers {
+        val figuresByPlayers = mutableMapOf<PlayerIndex, MutableList<Figure>>()
+        figures.forEachIndexed{ i: Int, f: DeskFigure? ->
+            if (f != null) {
+                val playerFigures = figuresByPlayers.computeIfAbsent(f.player){ mutableListOf() }
+                playerFigures.add(Figure(id = f.id, p = P(i, lines, columns), type = f.type))
+            }
+        }
+        return figuresByPlayers
     }
 
     fun figureAt(l: Int, c: Int): Figure? {

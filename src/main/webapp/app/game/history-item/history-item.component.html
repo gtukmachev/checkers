@@ -1,4 +1,6 @@
-{{state.turn}} :
+{{historyItem | json}}
+<!--
+{{historyItem.turn}} :
 <span *ngIf="state.turn === 0">
     first turn
 </span>
@@ -11,4 +13,4 @@
     <span *ngFor="let step of state.lastMove!.steps">
             {{step.start.l+1}}{{cols[step.start.c]}}-{{step.end.l+1}}{{cols[step.end.c]}}
     </span>
-</span>
+</span>-->

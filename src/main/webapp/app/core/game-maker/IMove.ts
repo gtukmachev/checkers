@@ -1,4 +1,4 @@
-import { P } from 'app/core/game-maker/GameMessages';
+import { P } from 'app/core/game-maker/GameStateData';
 
 export interface IMove {
     turn: number;

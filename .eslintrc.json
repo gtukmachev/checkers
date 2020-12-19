@@ -26,6 +26,7 @@
         "object-shorthand": "off",
         "prefer-const": "off",
         "@typescript-eslint/no-empty-interface": "off",
-        "spaced-comment": "off"
+        "spaced-comment": "off",
+        "@typescript-eslint/no-parameter-properties": "off"
     }
 }

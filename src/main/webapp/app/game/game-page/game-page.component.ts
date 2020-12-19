@@ -1,24 +1,19 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameMakerService } from 'app/core/game-maker/game-maker.service';
-import {
-    AllFiguresOnBoard,
-    ClassCastException,
-    Field,
-    FigureColor,
-    FigureOnBoard,
-    FigureType,
-    GameInfo,
-    GameMessage,
-    GameState,
-    GameStatus,
-    initialGameState,
-    ItIsNotYourStepError,
-    P,
-    PlayerInfo,
-    WaitingForAGame,
-} from 'app/core/game-maker/GameMessages';
 import { Subscription } from 'rxjs';
 import { IMove } from 'app/core/game-maker/IMove';
+import {
+    GameInfo,
+    ItIsNotYourStepError,
+    NextMoveInfo,
+    PlayerInfo,
+    ToPlayerMessage,
+    WaitingForAGame,
+    WebServiceOutcomeMessage,
+    WrongMoveError,
+} from 'app/core/game-maker/ExternalMessages';
+import { ClassCastException } from 'app/core/game-maker/exceptions';
+import { Board, BoardHistoryItem, Desk, GameHistory, P } from 'app/core/game-maker/GameStateData';
 
 @Component({
     selector: 'jhi-game-page',
@@ -26,84 +21,86 @@ import { IMove } from 'app/core/game-maker/IMove';
     styleUrls: ['./game-page.component.scss'],
 })
 export class GamePageComponent implements OnInit, OnDestroy {
-    public incomeMessages: GameMessage[] = [];
+    // constants
+    public static initialDesk: Desk = Desk.initialDesk(8, 8, 2);
+    public colChar: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+
+    public incomeMessages: WebServiceOutcomeMessage[] = [];
     public counter: number = 0;
 
     public gameId: number = -1;
-    public currentState: GameState = initialGameState();
-    public history: GameState[] = [];
-    public me: PlayerInfo | null = null;
     public players: PlayerInfo[] = [];
+    public board: Board = Board.initialBoard(GamePageComponent.initialDesk);
+    public history: GameHistory = [];
+
+    public me: PlayerInfo | null = null;
     public opponent: PlayerInfo | null = null;
 
-    public colChar: string[] = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-
     private gameSubscription?: Subscription;
-    public figures: AllFiguresOnBoard = new Map<FigureColor, FigureOnBoard[]>();
 
-    constructor(private gameMakerService: GameMakerService) {}
+    constructor(private gameMakerService: GameMakerService) {
+        console.trace('GamePageComponent.constructor():');
+    }
 
     ngOnInit(): void {
-        this.gameSubscription = this.gameMakerService.userGameChannel.subscribe((msg: GameMessage) => this.onGameMessage(msg));
+        console.trace('GamePageComponent.ngOnInit():');
+        this.gameSubscription = this.gameMakerService.userGameChannel.subscribe((msg: ToPlayerMessage) => this.onGameMessage(msg));
     }
 
     ngOnDestroy(): void {
+        console.trace('GamePageComponent.ngOnDestroy():');
         this.gameSubscription?.unsubscribe();
     }
 
-    private onGameMessage(msg: GameMessage): void {
-        console.log('onGameMessage:', msg);
-        switch (msg.msgType) {
-            case 'GameState':
-                this.onMsg_GameState(msg.msg as GameState);
-                break;
-            case 'GameStatus':
-                this.onMsg_GameStatus(msg.msg as GameStatus);
-                break;
-            case 'ItIsNotYourStepError':
-                this.onMsg_ItIsNotYourStepError(msg.msg as ItIsNotYourStepError);
-                break;
-            case 'WaitingForAGame':
-                this.onMsg_WaitingForAGame(msg.msg as WaitingForAGame);
-                break;
-            case 'GameInfo':
-                this.onMsg_GameInfo(msg.msg as GameInfo);
-                break;
-            default:
-                throw new ClassCastException(
-                    `The type "${msg.msgType}" is unrecognized! Supported types are: [GameState, GameStatus, ItIsNotYourStepError, WaitingForAGame, GameInfo]`
-                );
+    private onGameMessage(msg: ToPlayerMessage): void {
+        console.trace('GamePageComponent.onGameMessage():', msg);
+        if (msg instanceof WaitingForAGame) this.onMsg_WaitingForAGame(msg);
+        else if (msg instanceof ItIsNotYourStepError) this.onMsg_ItIsNotYourStepError(msg);
+        else if (msg instanceof NextMoveInfo) this.onMsg_NextMoveInfo(msg);
+        else if (msg instanceof WrongMoveError) this.onMsg_WrongMoveError(msg);
+        else if (msg instanceof GameInfo) this.onMsg_GameInfo(msg);
+
+        throw new ClassCastException(
+            `The type "${msg}" is unrecognized! Supported types are: [WaitingForAGame, ItIsNotYourStepError, NextMoveInfo, WrongMoveError, GameInfo]`
+        );
+    }
+
+    private onMsg_WrongMoveError(wrongMoveError: WrongMoveError): void {
+        console.trace('GamePageComponent.onMsg_WrongMoveError():', wrongMoveError);
+    }
+
+    private onMsg_NextMoveInfo(nextMoveInfo: NextMoveInfo): void {
+        console.trace('GamePageComponent.onMsg_NextMoveInfo():', nextMoveInfo);
+        const expectedNextTurnNumber = this.board.turn + 1;
+        const nextTurnNumber = nextMoveInfo.newBoard.turn;
+
+        if (expectedNextTurnNumber !== nextTurnNumber) {
+            // something wrong!!!!
+            console.warn(
+                `The game state is unsynchronized ( expected next turn number is '${expectedNextTurnNumber}', but the  received is '${nextTurnNumber}') ! Requesting full game info from server...`
+            );
+            this.gameMakerService.updateGameStateRequest();
+            return;
         }
-    }
 
-    private onMsg_GameState(gameState: GameState): void {
-        this.history.push(this.currentState);
-        this.currentState = gameState;
-
-        this.figures = this.loadFigures(this.currentState.field);
-    }
-
-    private onMsg_GameStatus(gameStatusMsg: GameStatus): void {
-        this.currentState = gameStatusMsg.currentState;
-        this.history = gameStatusMsg.history;
-
-        this.figures = this.loadFigures(this.currentState.field);
+        this.history.push(new BoardHistoryItem(this.board, nextMoveInfo.lastMove));
+        this.board = nextMoveInfo.newBoard;
     }
 
     private onMsg_GameInfo(gameInfoMsg: GameInfo): void {
+        console.trace('GamePageComponent.onMsg_GameInfo():', gameInfoMsg);
         this.gameId = gameInfoMsg.gameId;
-        this.me = gameInfoMsg.you;
         this.players = gameInfoMsg.players;
-        this.onMsg_GameStatus(gameInfoMsg.gameStatus);
-        if (this.players[0].index === this.me.index) {
-            this.opponent = this.players[1];
-        } else {
-            this.opponent = this.players[0];
-        }
+        this.board = gameInfoMsg.board;
+        this.history = gameInfoMsg.history;
+
+        let opponentIndex = gameInfoMsg.you === 0 ? 1 : 0;
+        this.me = gameInfoMsg.players[gameInfoMsg.you];
+        this.opponent = gameInfoMsg.players[opponentIndex];
     }
 
     private onMsg_ItIsNotYourStepError(itIsNotYourStepError: ItIsNotYourStepError): void {
-        console.trace('onMsg_ItIsNotYourStepError():', itIsNotYourStepError);
+        console.trace('GamePageComponent.onMsg_ItIsNotYourStepError():', itIsNotYourStepError);
 
         // This means - my current state is broken.
         // Probably, due some connection issues and loosing a number of income messages
@@ -112,37 +109,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     private onMsg_WaitingForAGame(waitingForAGame: WaitingForAGame): void {
-        console.trace('onMsg_WaitingForAGame():', waitingForAGame);
-    }
-
-    private loadFigures(field: Field): AllFiguresOnBoard {
-        let fs = new Map<FigureColor, FigureOnBoard[]>();
-        let black: FigureOnBoard[] = [];
-        let white: FigureOnBoard[] = [];
-
-        fs.set(FigureColor.WHITE, white);
-        fs.set(FigureColor.BLACK, black);
-
-        let i = 0;
-        for (let l = 0; l < 8; l++) {
-            for (let c = 0; c < 8; c++) {
-                const figure = field.desk[i];
-                const f: FigureOnBoard = { l: l, c: c, isQuinn: figure?.type === FigureType.QUINN, isActive: false };
-                switch (figure?.color) {
-                    case FigureColor.WHITE: {
-                        white.push(f);
-                        break;
-                    }
-                    case FigureColor.BLACK: {
-                        black.push(f);
-                        break;
-                    }
-                }
-                i++;
-            }
-        }
-
-        return fs;
+        console.trace('GamePageComponent.onMsg_WaitingForAGame():', waitingForAGame);
     }
 
     startGameRequest(): void {
@@ -150,9 +117,9 @@ export class GamePageComponent implements OnInit, OnDestroy {
     }
 
     sendStepToServer(cellsQueue: P[]): void {
-        console.log('sendStepToServer:', cellsQueue);
+        console.trace('GamePageComponent.sendStepToServer():', cellsQueue);
         const step: IMove = {
-            turn: this.currentState.turn,
+            turn: this.board.turn,
             cellsQueue: cellsQueue,
         };
         this.gameMakerService.sendStep(step);

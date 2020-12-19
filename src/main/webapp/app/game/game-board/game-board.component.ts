@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { AllFiguresOnBoard, FigureColor, FigureOnBoard, P } from 'app/core/game-maker/GameMessages';
+import { colorOfPlayerByIndex, Figure, FigureColor, FiguresByPlayers, FigureType, P } from 'app/core/game-maker/GameStateData';
 
 @Component({
     selector: 'jhi-game-board',
@@ -7,12 +7,14 @@ import { AllFiguresOnBoard, FigureColor, FigureOnBoard, P } from 'app/core/game-
     styleUrls: ['./game-board.component.scss'],
 })
 export class GameBoardComponent implements OnInit, OnChanges {
-    @Input() figures: AllFiguresOnBoard = new Map();
-    @Input() myColor?: FigureColor = FigureColor.WHITE;
+    @Input() figures: FiguresByPlayers = {};
+    @Input() myPlayerIndex!: number;
     @Output() doMove: EventEmitter<P[]> = new EventEmitter<P[]>();
 
+    myColor: FigureColor = FigureColor.WHITE;
     FigureColor_WHITE = FigureColor.WHITE;
     FigureColor_BLACK = FigureColor.BLACK;
+    figureType_QUINN = FigureType.QUINN;
 
     // parameters of board graphic
     cellSize = 100; // size of board field
@@ -46,7 +48,7 @@ export class GameBoardComponent implements OnInit, OnChanges {
 
     boardIndex = [0, 1, 2, 3, 4, 5, 6, 7];
 
-    activeShashka: FigureOnBoard | null = null;
+    activeFigure: Figure | null = null;
 
     cellsQueue: P[] = [];
 
@@ -64,7 +66,8 @@ export class GameBoardComponent implements OnInit, OnChanges {
     constructor() {}
 
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes.myColor) {
+        if (changes.myPlayerIndex) {
+            this.myColor = colorOfPlayerByIndex(changes.myPlayerIndex.currentValue);
             if (this.myColor === FigureColor.WHITE) {
                 this.colChar = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
                 this.linChar = ['8', '7', '6', '5', '4', '3', '2', '1'];
@@ -85,15 +88,11 @@ export class GameBoardComponent implements OnInit, OnChanges {
 
     ngOnInit(): void {}
 
-    clickToShaka(f: FigureOnBoard): void {
+    clickToShaka(f: Figure): void {
         if (this.cellsQueue.length < 2) {
-            if (this.activeShashka) {
-                this.activeShashka.isActive = false;
-            }
             this.cellsQueue.length = 0;
-            this.cellsQueue.push({ l: f.l, c: f.c });
-            this.activeShashka = f;
-            f.isActive = true;
+            this.cellsQueue.push(f.p);
+            this.activeFigure = f;
         }
     }
 
@@ -108,7 +107,7 @@ export class GameBoardComponent implements OnInit, OnChanges {
     private handleCellClick(p: P): void {
         console.warn(`handleCellClick():`, p);
 
-        if (!this.activeShashka) return;
+        if (this.activeFigure == null) return;
 
         let last: P | null = null;
         if (this.cellsQueue.length > 0) last = this.cellsQueue[this.cellsQueue.length - 1];
@@ -123,17 +122,14 @@ export class GameBoardComponent implements OnInit, OnChanges {
 
     private convertCoordinatesFromScreenToGameAxis(l: number, c: number): P {
         if (this.myColor === FigureColor.WHITE) {
-            return { l: 7 - l, c: c };
+            return new P(7 - l, c);
         } else {
-            return { l: l, c: 7 - c };
+            return new P(l, 7 - c);
         }
     }
 
     private eraseState(): void {
         this.cellsQueue.length = 0;
-        if (this.activeShashka) {
-            this.activeShashka.isActive = false;
-            this.activeShashka = null;
-        }
+        this.activeFigure = null;
     }
 }

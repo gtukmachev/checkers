@@ -17,15 +17,17 @@
                 col-md-9
             ">
                 <div class="row"><div class="col text-center">
-                    <jhi-game-board-user-panel [player]="opponent" [activePlayerIndex]="currentState.activePlayer"></jhi-game-board-user-panel>
+                    <jhi-game-board-user-panel *ngIf="opponent"  [player]="opponent!" [activePlayerIndex]="board.activePlayerIndex">
+                    </jhi-game-board-user-panel>
                 </div></div>
                 <div class="row"><div class="col">
-                        <jhi-game-board [figures]="figures" [myColor]="me?.color"
+                        <jhi-game-board [figures]="board.figures" [myPlayerIndex]="(me == null ? 0 : me!.index)"
                                         (doMove)="sendStepToServer($event)"
                         ></jhi-game-board>
                 </div></div>
                 <div class="row"><div class="col text-center">
-                    <jhi-game-board-user-panel [player]="me" [activePlayerIndex]="currentState.activePlayer"></jhi-game-board-user-panel>
+                    <jhi-game-board-user-panel *ngIf="me" [player]="me!" [activePlayerIndex]="board.activePlayerIndex">
+                    </jhi-game-board-user-panel>
                 </div></div>
             </div>
             <div class="
@@ -34,10 +36,9 @@
                     col-md-3
             ">
                 <ul class="list-group">
-                    <li *ngFor="let historyItem of history; let i = index;" class="list-group-item list-group-item-action">
-                        <jhi-history-item [state] = "historyItem"></jhi-history-item>
+                    <li *ngFor="let historyItem of history;" class="list-group-item list-group-item-action">
+                        <jhi-history-item [historyItem] = "historyItem"></jhi-history-item>
                     </li>
-                    <li *ngIf="currentState.turn > 0" class="list-group-item list-group-item-action"><jhi-history-item [state]="currentState"></jhi-history-item></li>
                 </ul>
             </div>
         </div>

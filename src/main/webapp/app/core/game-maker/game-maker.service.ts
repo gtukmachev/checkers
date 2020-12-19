@@ -6,14 +6,14 @@ import { Location } from '@angular/common';
 import { Observable } from 'rxjs';
 import { IMessage } from '@stomp/stompjs';
 import { map } from 'rxjs/operators';
-import { GameMessage } from 'app/core/game-maker/GameMessages';
+import { ToPlayerMessage, WebServiceOutcomeMessage } from 'app/core/game-maker/ExternalMessages';
 import { IMove } from 'app/core/game-maker/IMove';
 
 @Injectable({
     providedIn: 'root',
 })
 export class GameMakerService {
-    private _userGameChannel: Observable<GameMessage> | null = null;
+    private _userGameChannel: Observable<ToPlayerMessage> | null = null;
 
     constructor(private stompService: StompRService, private authServerProvider: AuthServerProvider, private location: Location) {
         // this.subscribeToUserGameChannel();
@@ -62,11 +62,11 @@ export class GameMakerService {
         this.getConnectedStompService().publish('/queue/state');
     }
 
-    get userGameChannel(): Observable<GameMessage> {
+    get userGameChannel(): Observable<ToPlayerMessage> {
         if (this._userGameChannel == null) {
             this._userGameChannel = this.getConnectedStompService()
                 .watch('/user/queue/game')
-                .pipe(map<IMessage, GameMessage>((msg: IMessage) => JSON.parse(msg.body) as GameMessage));
+                .pipe(map<IMessage, ToPlayerMessage>((msg: IMessage) => WebServiceOutcomeMessage.fromJson(JSON.parse(msg.body)).msg));
         }
         return this._userGameChannel;
     }

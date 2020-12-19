@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { FigureColor, FigureType, GameState } from 'app/core/game-maker/GameMessages';
+import { BoardHistoryItem, FigureColor, FigureType } from 'app/core/game-maker/GameStateData';
 
 @Component({
     selector: 'jhi-history-item',
@@ -7,7 +7,7 @@ import { FigureColor, FigureType, GameState } from 'app/core/game-maker/GameMess
     styleUrls: ['./history-item.component.scss'],
 })
 export class HistoryItemComponent {
-    @Input() state!: GameState;
+    @Input() historyItem!: BoardHistoryItem;
 
     figureColorWhite = FigureColor.WHITE;
     figureTypeQuinn = FigureType.QUINN;

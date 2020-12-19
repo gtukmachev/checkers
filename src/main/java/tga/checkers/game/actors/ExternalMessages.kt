@@ -24,16 +24,16 @@ interface ToPlayerMessage
         val index: Int,
         val name: String,
         val color: FigureColor = colorOfPlayerByIndex(index),
-    )
+    ) : ToPlayerMessage
 
     data class NextMoveInfo(
         val newBoard: Board,
         val lastMove: PlayerMove
-    )
+    ) : ToPlayerMessage
 
     data class WrongMoveError(
-        val move: BoardHistoryItem
-    )
+        val move: PlayerMove
+    ) : ToPlayerMessage
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 interface WebServiceIncomeMessage
