@@ -24,7 +24,7 @@ export function fromJson_FigureType(json: any): FigureType {
         case 'QUINN':
             return FigureType.QUINN;
         default:
-            throw new ClassCastException(`The value cannot be converted to enum FigureType: "${json}"`, null);
+            throw new ClassCastException(`The value cannot be converted to enum FigureType: "${json}"`, json);
     }
 }
 
@@ -274,7 +274,7 @@ export class FigureStep {
     public static fromJson(json: any): FigureStep {
         let begin_: P = P.fromJson(getFromJson<any>(json, 'begin'));
         let end_: P = P.fromJson(getFromJson<any>(json, 'end'));
-        let shotObj = getFromJson<any | null>(json, 'figure');
+        let shotObj = getFromJson<any | null>(json, 'shot');
         let shot_: Figure | null = shotObj == null ? null : Figure.fromJson(shotObj);
         return new FigureStep(begin_, end_, shot_);
     }

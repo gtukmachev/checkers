@@ -150,7 +150,7 @@ export class WebServiceOutcomeMessage {
                 }
             default:
                 throw new ClassCastException(
-                    `The type "${msgType}" is unrecognized! Supported types are: [GameInfo, NextMoveInfo, WaitingForAGame, WrongMoveError, ItIsNotYourStepError]`
+                    `The type "${msgType}" is unrecognized! Supported types are: [GameInfo, NextMoveInfo, WaitingForAGame, WrongMoveError, ItIsNotYourStepError]. type=`, msgType
                 );
         }
     }

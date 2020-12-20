@@ -1,16 +1,12 @@
-{{historyItem | json}}
-<!--
-{{historyItem.turn}} :
-<span *ngIf="state.turn === 0">
-    first turn
-</span>
-<span *ngIf="state.turn > 0">
+{{historyItem.before.turn + 1}} :
     {{
-        state.lastMove!.figure.color === figureColorWhite ? "W" : "B"
+        historyItem.move.playerIndex === 0 ? "W" : "B"
     }}{{
-        state.lastMove!.figure.type === figureTypeQuinn ? "Q" : "S"
+        historyItem.move.figure.type === figureTypeQuinn ? "Q" : "S"
     }}
-    <span *ngFor="let step of state.lastMove!.steps">
-            {{step.start.l+1}}{{cols[step.start.c]}}-{{step.end.l+1}}{{cols[step.end.c]}}
+    <span *ngFor="let step of historyItem.move.steps">
+        {{step.begin.toHumanCoordinates()}}
+        <span *ngIf="step.shot !== null" class="text-danger">({{step.shot?.p?.toHumanCoordinates()}})</span>
+        <span *ngIf="step.shot === null">-></span>
+        {{step.end.toHumanCoordinates()}}
     </span>
-</span>-->
