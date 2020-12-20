@@ -21,12 +21,19 @@
                     </jhi-game-board-user-panel>
                 </div></div>
                 <div class="row"><div class="col">
-                        <jhi-game-board [figures]="board.figures" [myPlayerIndex]="(me == null ? 0 : me!.index)"
-                                        (doMove)="sendStepToServer($event)"
+                        <jhi-game-board
+                                [figures]="board.figures"
+                                [myPlayerIndex]="(me == null ? 0 : me!.index)"
+                                [activePlayerIndex]="board.activePlayerIndex"
+
+                                (doMove)="sendStepToServer($event)"
                         ></jhi-game-board>
                 </div></div>
                 <div class="row"><div class="col text-center">
-                    <jhi-game-board-user-panel *ngIf="me" [player]="me!" [activePlayerIndex]="board.activePlayerIndex">
+                    <jhi-game-board-user-panel *ngIf="me"
+                                               [player]="me!"
+                                               [activePlayerIndex]="board.activePlayerIndex"
+                    >
                     </jhi-game-board-user-panel>
                 </div></div>
             </div>

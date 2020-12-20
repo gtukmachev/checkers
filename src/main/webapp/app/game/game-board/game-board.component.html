@@ -1,6 +1,6 @@
 <svg width="100%" [attr.viewBox]="vb" class="board">
 
-    <!-- aroind border -->
+    <!-- around border -->
     <g>
         <rect [attr.x]="b1" [attr.y]="b1" [attr.width]="b1s" [attr.height]="b1s" class="border"></rect>
         <rect [attr.x]="b2" [attr.y]="b2" [attr.width]="b2s" [attr.height]="b2s" class="border"></rect>
@@ -76,15 +76,18 @@
                 [attr.cy]="fy0 + f.p.l * fyCellSize"
             [attr.r]="stoneRadius"
             class="shashka black"
-            [ngClass]="{active: f === activeFigure}"
-            (click)="clickToShaka(f)"
+            [ngClass]="{
+                            active: f === activeFigure,
+                            activation: (activePlayerIndex === myPlayerIndex) && (myPlayerIndex === 1) && (cellsQueue.length < 2)
+                       }"
+            (click)="clickToShaka(f, 1)"
         ></circle>
         <circle *ngIf="f.type == figureType_QUINN"
                 [attr.cx]="fx0 + f.p.c * fxCellSize"
                 [attr.cy]="fy0 + f.p.l * fyCellSize"
                 [attr.r]="stoneRadius/2"
                 class="shashka black quinn"
-                (click)="clickToShaka(f)"
+                (click)="clickToShaka(f, 1)"
         ></circle>
     </g>
 
@@ -95,15 +98,18 @@
                 [attr.cy]="fy0 + f.p.l * fyCellSize"
                 [attr.r]="stoneRadius"
                 class="shashka white"
-                [ngClass]="{active: f === activeFigure}"
-                (click)="clickToShaka(f)"
+                [ngClass]="{
+                            active: f === activeFigure,
+                            activation: (activePlayerIndex === myPlayerIndex) && (myPlayerIndex === 0) && (cellsQueue.length < 2)
+                       }"
+                (click)="clickToShaka(f, 0)"
         ></circle>
         <circle *ngIf="f.type == figureType_QUINN"
                 [attr.cx]="fx0 + f.p.c * fxCellSize"
                 [attr.cy]="fy0 + f.p.l * fyCellSize"
                 [attr.r]="stoneRadius/2"
                 class="shashka white quinn"
-                (click)="clickToShaka(f)"
+                (click)="clickToShaka(f, 0)"
         ></circle>
     </g>
 

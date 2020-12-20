@@ -105,6 +105,10 @@ export class P {
     public toHumanCoordinates(): string {
         return `${this.l + 1}${P.chars[this.c]}`;
     }
+
+    public isDark(): boolean {
+        return (this.l + this.c) % 2 === 0;
+    }
 }
 
 export class Figure {

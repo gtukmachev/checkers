@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { colorOfPlayerByIndex, Figure, FigureColor, FiguresByPlayers, FigureType, P } from 'app/core/game-maker/GameStateData';
+import { colorOfPlayerByIndex, Figure, FigureColor, FiguresByPlayers, FigureType, P, PlayerIndex } from 'app/core/game-maker/GameStateData';
 
 @Component({
     selector: 'jhi-game-board',
@@ -9,6 +9,10 @@ import { colorOfPlayerByIndex, Figure, FigureColor, FiguresByPlayers, FigureType
 export class GameBoardComponent implements OnInit, OnChanges {
     @Input() figures: FiguresByPlayers = {};
     @Input() myPlayerIndex!: number;
+    @Input() activePlayerIndex!: number;
+
+    isMyTurn: boolean = false;
+
     @Output() doMove: EventEmitter<P[]> = new EventEmitter<P[]>();
 
     myColor: FigureColor = FigureColor.WHITE;
@@ -83,30 +87,41 @@ export class GameBoardComponent implements OnInit, OnChanges {
                 this.fxCellSize = -this.cellSize;
                 this.fyCellSize = this.cellSize;
             }
+            this.checkIfMyTurn(changes.myPlayerIndex.currentValue, this.activePlayerIndex);
+        } else if (changes.activePlayerIndex) {
+            this.checkIfMyTurn(this.myPlayerIndex, changes.activePlayerIndex.currentValue);
         }
+    }
+
+    private checkIfMyTurn(myPlayerIndex: number, activePlayerIndex: number): void {
+        this.isMyTurn = myPlayerIndex === activePlayerIndex;
     }
 
     ngOnInit(): void {}
 
-    clickToShaka(f: Figure): void {
-        if (this.cellsQueue.length < 2) {
-            this.cellsQueue.length = 0;
-            this.cellsQueue.push(f.p);
-            this.activeFigure = f;
-        }
+    clickToShaka(f: Figure, figurePlayerIndex: PlayerIndex): void {
+        if (!this.isMyTurn) return; // It's my turn
+        if (figurePlayerIndex !== this.myPlayerIndex) return; // It's my figure
+        if (this.cellsQueue.length >= 2) return; // I didn't move another figure yet
+
+        this.cellsQueue.length = 0;
+        this.cellsQueue.push(f.p);
+        this.activeFigure = f;
     }
 
     cellClick(l: number, c: number): void {
+        if (!this.isMyTurn) return;
         this.handleCellClick(this.convertCoordinatesFromScreenToGameAxis(l, c));
     }
 
     activeCellClick(p: P): void {
+        if (!this.isMyTurn) return;
         this.handleCellClick(p);
     }
 
     private handleCellClick(p: P): void {
-        console.warn(`handleCellClick():`, p);
-
+        if (!this.isMyTurn) return;
+        if (!p.isDark()) return;
         if (this.activeFigure == null) return;
 
         let last: P | null = null;
