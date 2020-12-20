@@ -7,9 +7,10 @@ export class AttributeMissedException extends Throwable {
 }
 
 export function getFromJson<T>(json: any, attr: string): T {
-    let value = json[attr];
-    if (value) {
+    if (Object.prototype.hasOwnProperty.call(json, attr)) {
+        let value = json[attr];
         return value as T;
     }
+
     throw new AttributeMissedException(json, attr);
 }

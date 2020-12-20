@@ -111,7 +111,7 @@ export class Figure {
     constructor(public readonly id: number, public readonly p: P, public readonly type: FigureType) {}
 
     public static fromJson(json: any): Figure {
-        let id_: number = getFromJson<number>(json, 'l');
+        let id_: number = getFromJson<number>(json, 'id');
         let p_: P = P.fromJson(getFromJson<any>(json, 'p'));
         let type_: FigureType = fromJson_FigureType(getFromJson<any>(json, 'type'));
         return new Figure(id_, p_, type_);

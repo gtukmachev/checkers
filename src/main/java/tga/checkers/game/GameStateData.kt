@@ -111,12 +111,12 @@ data class Desk(
             var nextFigureId = 0
 
             // 3 first of WHITE in 2x2 game
-            for (l in 0..2) for (c in 0..columns) if ( (l+c) % 2 == 0){
+            for (l in 0..2) for (c in 0 until columns) if ( (l+c) % 2 == 0){
                 desk[l,c] = DeskFigure(0, FigureType.STONE, nextFigureId++)
             }
 
             // 3 last rows of BLACK in 2x2 game
-            for (l in (lines-3) until lines) for (c in 0..columns) if ( (l+c) % 2 == 0){
+            for (l in (lines-3) until lines) for (c in 0 until columns) if ( (l+c) % 2 == 0){
                 desk[l,c] = DeskFigure(1, FigureType.STONE, nextFigureId++)
             }
 
