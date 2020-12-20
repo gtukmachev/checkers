@@ -50,15 +50,28 @@ class GameActor(
 
 
     private val waitingForStepsBehavior = ReceiveBuilder()
-            .on(PlayerMoveInfo::class, { sender == activePlayer.actor }){ onPlayerMoveInfo(it)              }
+            .on(PlayerMoveInfo::class, { sender == activePlayer.actor }){ onPlayerMoveInfo(it)          }
             .on(PlayerMoveInfo::class                                  ){ onWrongPlayerStep(it, sender) }
             .on(NotifyPlayer::class                                    ){ onNotifyPlayer(it)            }
+            .on(ResetGameMessage::class                                ){ onResetGameMessage(it)        }
+            .on(ResignGameMessage::class                               ){ onResignGameMessage(it)       }
             .build()
-
 
     private fun onNotifyPlayer(notifyPlayerMsg: NotifyPlayer) {
         val pl = playersCycle.firstOrNull{ it.name == notifyPlayerMsg.userName }
         pl?.let{ sendGameInfoToPlayer(it) }
+    }
+
+    private fun onResetGameMessage(resetGameMessage: ResetGameMessage) {
+        desk.reset()
+        board = Board.initialBoard(desk)
+        history = listOf()
+        playersCycle.forEach { sendGameInfoToPlayer(it) }
+    }
+
+
+    private fun onResignGameMessage(resignGameMessage: ResignGameMessage) {
+        TODO("Not yet implemented")
     }
 
     private fun onStartGame() {

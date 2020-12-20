@@ -10,10 +10,7 @@ import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.messaging.simp.annotation.SubscribeMapping
 import org.springframework.stereotype.Controller
 import tga.checkers.exts.millis
-import tga.checkers.game.actors.GameRequest
-import tga.checkers.game.actors.NotifyPlayer
-import tga.checkers.game.actors.PlayerMoveInfo
-import tga.checkers.game.actors.StatusRequest
+import tga.checkers.game.actors.*
 import java.security.Principal
 import java.util.concurrent.TimeUnit
 
@@ -24,7 +21,7 @@ class GameWebService(
 ) {
 
     companion object {
-        val log: Logger = LoggerFactory.getLogger(GameWebService::class.java);
+        val log: Logger = LoggerFactory.getLogger(GameWebService::class.java)
     }
 
     /**
@@ -33,7 +30,7 @@ class GameWebService(
      */
     @SubscribeMapping("/user/queue/game")
     fun connectToGameChannel(principal: Principal) {
-        log.debug("@SubscribeMapping(\"/user/queue/game\") => connectToGameChannel", principal.name)
+        log.trace("@SubscribeMapping(\"/user/queue/game\") => connectToGameChannel", principal.name)
         gameMakerActor.tell( StatusRequest(principal.name), ActorRef.noSender() )
     }
 
@@ -43,7 +40,7 @@ class GameWebService(
      */
     @MessageMapping("/queue/new-game")
     fun gameMakeRequest(principal: Principal) {
-        log.debug("@MessageMapping(\"/queue/new-game\") => gameMakeRequest()", principal.name)
+        log.trace("@MessageMapping(\"/queue/new-game\") => gameMakeRequest()", principal.name)
         val msg = GameRequest( principal.name )
         gameMakerActor.tell(msg, ActorRef.noSender())
     }
@@ -52,25 +49,16 @@ class GameWebService(
     /**
      * A message from a player about his step in his game
      */
-    @MessageMapping("/queue/steps")
-    fun stepFromPlayer(
-                     principal: Principal,
-            @Payload      move: PlayerMoveInfo
-    ) {
-        log.debug("@MessageMapping(\"/queue/steps\") => fromPlayer(principal={})", principal.name, move)
-        val playerActor = findPlayerActor(principal.name)
-        playerActor?.tell(move, ActorRef.noSender())
-    }
+    @MessageMapping("/queue/steps"            ) fun   stepMsg(user: Principal, @Payload msg: PlayerMoveInfo   ) = forwardToPlayerActor(user, msg)
+    @MessageMapping("/queue/resetGameMessage" ) fun  resetMsg(user: Principal, @Payload msg: ResetGameMessage ) = forwardToPlayerActor(user, msg)
+    @MessageMapping("/queue/resignGameMessage") fun resignMsg(user: Principal, @Payload msg: ResignGameMessage) = forwardToPlayerActor(user, msg)
+    @MessageMapping("/queue/state"            ) fun      info(user: Principal                                 ) = forwardToPlayerActor(user, NotifyPlayer(user.name))
 
-    @MessageMapping("/queue/state")
-    fun gameInfoRequest(
-            principal: Principal
-    ) {
-        log.debug("@MessageMapping(\"/queue/state\") => gameInfoRequest()", principal.name)
-        val playerActor = findPlayerActor(principal.name)
-        playerActor?.tell( NotifyPlayer(principal.name) , ActorRef.noSender())
+    private fun forwardToPlayerActor(user: Principal, msg: WebServiceIncomeMessage){
+        log.trace("forwardToPlayerActor(user=${user.name}, msg=$msg)")
+        val playerActor = findPlayerActor(user.name)
+        playerActor?.tell(msg, ActorRef.noSender())
     }
-
 
     private fun findPlayerActor(playerName: String) = findActor("/user/game-maker/player-$playerName")
     private fun findGameActor(gameId: Int) = findActor("/user/game-maker/game-$gameId")

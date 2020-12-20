@@ -103,6 +103,18 @@ export class PlayerMoveInfo extends WebServiceIncomeMessage {
     }
 }
 
+export class ResetGameMessage extends WebServiceIncomeMessage {
+    constructor(public readonly turn: number) {
+        super();
+    }
+}
+
+export class ResignGameMessage extends WebServiceIncomeMessage {
+    constructor(public readonly turn: number) {
+        super();
+    }
+}
+
 /////////////////////////////////////////////////////
 export class WebServiceOutcomeMessage {
     constructor(public readonly gameId: number, public readonly msgType: String, public readonly msg: ToPlayerMessage) {}
@@ -150,7 +162,8 @@ export class WebServiceOutcomeMessage {
                 }
             default:
                 throw new ClassCastException(
-                    `The type "${msgType}" is unrecognized! Supported types are: [GameInfo, NextMoveInfo, WaitingForAGame, WrongMoveError, ItIsNotYourStepError]. type=`, msgType
+                    `The type "${msgType}" is unrecognized! Supported types are: [GameInfo, NextMoveInfo, WaitingForAGame, WrongMoveError, ItIsNotYourStepError]. type=`,
+                    msgType
                 );
         }
     }

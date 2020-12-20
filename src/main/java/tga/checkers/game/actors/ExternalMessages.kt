@@ -42,3 +42,7 @@ interface WebServiceIncomeMessage
         val turn: Int,
         val cellsQueue: List<P>
     ) : WebServiceIncomeMessage
+
+    data class ResetGameMessage (val turn: Int) : WebServiceIncomeMessage
+    data class ResignGameMessage(val turn: Int) : WebServiceIncomeMessage
+

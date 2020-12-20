@@ -6,8 +6,13 @@ import { Location } from '@angular/common';
 import { Observable } from 'rxjs';
 import { IMessage } from '@stomp/stompjs';
 import { map } from 'rxjs/operators';
-import { ToPlayerMessage, WebServiceOutcomeMessage } from 'app/core/game-maker/ExternalMessages';
-import { IMove } from 'app/core/game-maker/IMove';
+import {
+    PlayerMoveInfo,
+    ResetGameMessage,
+    ResignGameMessage,
+    ToPlayerMessage,
+    WebServiceOutcomeMessage,
+} from 'app/core/game-maker/ExternalMessages';
 
 @Injectable({
     providedIn: 'root',
@@ -39,13 +44,20 @@ export class GameMakerService {
         this.getConnectedStompService().publish('/queue/new-game');
     }
 
+    public resetGame(resetGameMessage: ResetGameMessage): void {
+        this.getConnectedStompService().publish('/queue/resetGameMessage', JSON.stringify(resetGameMessage));
+    }
+
+    public resignGame(resignGameMessage: ResignGameMessage): void {
+        this.getConnectedStompService().publish('/queue/resignGameMessage', JSON.stringify(resignGameMessage));
+    }
+
     /**
      * A player should call this method in order to send his step to game server
-     * @param step: IStep
+     * @param playerMoveInfo
      */
-    public sendStep(step: IMove): void {
-        const msg = JSON.stringify(step);
-        this.getConnectedStompService().publish(`/queue/steps`, msg);
+    public sendStep(playerMoveInfo: PlayerMoveInfo): void {
+        this.getConnectedStompService().publish('/queue/steps', JSON.stringify(playerMoveInfo));
     }
 
     /**

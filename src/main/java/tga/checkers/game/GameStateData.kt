@@ -100,25 +100,31 @@ data class Desk(
         return figures.contentHashCode()
     }
 
+    fun reset() {
+        var nextFigureId = 0
+
+        for(i in figures.indices) figures[i] = null
+
+        // 3 first rows of WHITE in 2x2 game
+        for (l in 0..2) for (c in 0 until columns) if ( (l+c) % 2 == 0){
+            this[l,c] = DeskFigure(0, FigureType.STONE, nextFigureId++)
+        }
+
+        // 3 last rows of BLACK in 2x2 game
+        for (l in (lines-3) until lines) for (c in 0 until columns) if ( (l+c) % 2 == 0){
+            this[l,c] = DeskFigure(1, FigureType.STONE, nextFigureId++)
+        }
+    }
+
     companion object {
         fun initialDesk(lines: Int, columns: Int, players: Int): Desk{
-            val arr = Array<DeskFigure?>(lines*columns){ null }
-
             if (players !in 1..2) throw RuntimeException("Only 2 players games are supported now!")
+
+            val arr = Array<DeskFigure?>(lines*columns){ null }
 
             val desk = Desk(lines, columns, arr)
 
-            var nextFigureId = 0
-
-            // 3 first of WHITE in 2x2 game
-            for (l in 0..2) for (c in 0 until columns) if ( (l+c) % 2 == 0){
-                desk[l,c] = DeskFigure(0, FigureType.STONE, nextFigureId++)
-            }
-
-            // 3 last rows of BLACK in 2x2 game
-            for (l in (lines-3) until lines) for (c in 0 until columns) if ( (l+c) % 2 == 0){
-                desk[l,c] = DeskFigure(1, FigureType.STONE, nextFigureId++)
-            }
+            desk.reset()
 
             return desk
         }

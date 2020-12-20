@@ -1,12 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameMakerService } from 'app/core/game-maker/game-maker.service';
 import { Subscription } from 'rxjs';
-import { IMove } from 'app/core/game-maker/IMove';
 import {
     GameInfo,
     ItIsNotYourStepError,
     NextMoveInfo,
     PlayerInfo,
+    PlayerMoveInfo,
+    ResetGameMessage,
+    ResignGameMessage,
     ToPlayerMessage,
     WaitingForAGame,
     WebServiceOutcomeMessage,
@@ -54,15 +56,16 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     private onGameMessage(msg: ToPlayerMessage): void {
         console.trace('GamePageComponent.onGameMessage():', msg);
-             if (msg instanceof WaitingForAGame     ) this.onMsg_WaitingForAGame(msg);
+        if (msg instanceof WaitingForAGame) this.onMsg_WaitingForAGame(msg);
         else if (msg instanceof ItIsNotYourStepError) this.onMsg_ItIsNotYourStepError(msg);
-        else if (msg instanceof NextMoveInfo        ) this.onMsg_NextMoveInfo(msg);
-        else if (msg instanceof WrongMoveError      ) this.onMsg_WrongMoveError(msg);
-        else if (msg instanceof GameInfo            ) this.onMsg_GameInfo(msg);
-        else throw new ClassCastException(
-                    `The type "${msg}" is unrecognized! Supported types are:` +
-                        "[WaitingForAGame, ItIsNotYourStepError, NextMoveInfo, WrongMoveError, GameInfo]",
-                     msg
+        else if (msg instanceof NextMoveInfo) this.onMsg_NextMoveInfo(msg);
+        else if (msg instanceof WrongMoveError) this.onMsg_WrongMoveError(msg);
+        else if (msg instanceof GameInfo) this.onMsg_GameInfo(msg);
+        else
+            throw new ClassCastException(
+                `The type "${msg}" is unrecognized! Supported types are:` +
+                    '[WaitingForAGame, ItIsNotYourStepError, NextMoveInfo, WrongMoveError, GameInfo]',
+                msg
             );
     }
 
@@ -116,13 +119,17 @@ export class GamePageComponent implements OnInit, OnDestroy {
     startGameRequest(): void {
         this.gameMakerService.findGame();
     }
+    resetGameRequest(): void {
+        this.gameMakerService.resetGame(new ResetGameMessage(this.board.turn));
+    }
+    resignGameRequest(): void {
+        this.gameMakerService.resignGame(new ResignGameMessage(this.board.turn));
+    }
 
     sendStepToServer(cellsQueue: P[]): void {
         console.trace('GamePageComponent.sendStepToServer():', cellsQueue);
-        const step: IMove = {
-            turn: this.board.turn,
-            cellsQueue: cellsQueue,
-        };
-        this.gameMakerService.sendStep(step);
+
+        const playerMoveInfo = new PlayerMoveInfo(this.board.turn, cellsQueue);
+        this.gameMakerService.sendStep(playerMoveInfo);
     }
 }

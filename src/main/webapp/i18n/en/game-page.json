@@ -3,6 +3,8 @@
         "title": "Game",
         "subtitle": "Start the game!",
         "sendStep": "Step!",
-        "clear": "clear"
+        "clear": "clear",
+        "reset": "Reset",
+        "resign": "Resign"
     }
 }
