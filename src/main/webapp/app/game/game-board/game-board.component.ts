@@ -94,8 +94,7 @@ export class GameBoardComponent implements OnInit, OnChanges {
     }
 
     private checkIfMyTurn(myPlayerIndex: number, activePlayerIndex: number): void {
-        //this.isMyTurn = myPlayerIndex === activePlayerIndex;
-        this.isMyTurn = true
+        this.isMyTurn = myPlayerIndex === activePlayerIndex;
     }
 
     ngOnInit(): void {}
