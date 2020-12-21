@@ -56,15 +56,15 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     private onGameMessage(msg: ToPlayerMessage): void {
         console.trace('GamePageComponent.onGameMessage():', msg);
-             if (msg instanceof WaitingForAGame) this.onMsg_WaitingForAGame(msg);
+             if (msg instanceof NextMoveInfo        ) this.onMsg_NextMoveInfo(msg);
+        else if (msg instanceof GameInfo            ) this.onMsg_GameInfo(msg);
+        else if (msg instanceof WrongMoveError      ) this.onMsg_WrongMoveError(msg);
         else if (msg instanceof ItIsNotYourStepError) this.onMsg_ItIsNotYourStepError(msg);
-        else if (msg instanceof NextMoveInfo) this.onMsg_NextMoveInfo(msg);
-        else if (msg instanceof WrongMoveError) this.onMsg_WrongMoveError(msg);
-        else if (msg instanceof GameInfo) this.onMsg_GameInfo(msg);
+        else if (msg instanceof WaitingForAGame     ) this.onMsg_WaitingForAGame(msg);
         else
             throw new ClassCastException(
                 `The type "${msg}" is unrecognized! Supported types are:` +
-                    '[WaitingForAGame, ItIsNotYourStepError, NextMoveInfo, WrongMoveError, GameInfo]',
+                    '[WaitingForAGame, ItIsNotYourStepError, NextMoveInfo, WrongMoveError, GameInfo]! type=',
                 msg
             );
     }
