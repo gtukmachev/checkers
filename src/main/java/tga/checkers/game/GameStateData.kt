@@ -26,6 +26,7 @@ data class P(val l: Int, val c: Int) {
     fun toHumanCoordinates() = "${l+1}${'A'+c}"
 }
 
+enum class GameStatus { ACTIVE, FINISHED }
 
 //Desk.initialDesk(lines = 8, columns = 8, players = 2)
 data class Board(

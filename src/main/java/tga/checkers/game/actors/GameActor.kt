@@ -31,13 +31,18 @@ class GameActor(
 
     // the game state
     private var activePlayerNode: CycleList<Player> = playersCycle
+
+    private var gameStatus: GameStatus = GameStatus.ACTIVE
     private val activePlayer: Player get() = activePlayerNode.obj
-    val desk: Desk = Desk.initialDesk(lines = 8, columns = 8, players = 2)
-    var board: Board = Board.initialBoard(desk)
-    var history: GameHistory = listOf()
+    private val desk: Desk = Desk.initialDesk(lines = 8, columns = 8, players = 2)
+    private var board: Board = Board.initialBoard(desk)
+    private var history: GameHistory = listOf()
 
     override fun preStart() {
         log().debug("preStart")
+
+        // todo: load the game state from a DB
+
         playersCycle.forEach{ it.actor.tell(JoinToGame(self), self) }
     }
 
@@ -63,15 +68,16 @@ class GameActor(
     }
 
     private fun onResetGameMessage(resetGameMessage: ResetGameMessage) {
+        log().debug("onResetGameMessage({})", resetGameMessage)
         desk.reset()
         board = Board.initialBoard(desk)
         history = listOf()
         playersCycle.forEach { sendGameInfoToPlayer(it) }
     }
 
-
     private fun onResignGameMessage(resignGameMessage: ResignGameMessage) {
-        TODO("Not yet implemented")
+        log().debug("onResetGameMessage({})", resignGameMessage)
+        //TODO("Not yet implemented")
     }
 
     private fun onStartGame() {
@@ -82,7 +88,6 @@ class GameActor(
     }
 
     private fun sendGameInfoToPlayer(pl: Player) {
-        log().debug("sendGameInfoToPlayer(pl={})", pl)
         val gameInfo = GameInfo(
                 gameId  = gameId,
                 you     = pl.index,
@@ -90,7 +95,7 @@ class GameActor(
                 board   = board,
                 history = history
         )
-        log().debug("sendGameInfoToPlayer(pl={}) => gameInfo={}", gameInfo)
+        log().debug("sendGameInfoToPlayer(pl={}) => gameInfo={}", pl, gameInfo)
         pl.actor.tell(gameInfo, self)
     }
 
@@ -98,37 +103,46 @@ class GameActor(
         context.become( waitingForStepsBehavior )
     }
 
-
     private fun onPlayerMoveInfo(playerMoveInfo: PlayerMoveInfo) {
         log().debug("onPlayerMoveInfo(playerStep={})", playerMoveInfo)
 
-        performPlayerStep(playerMoveInfo = playerMoveInfo,
-            onSuccess =  { playerMove: PlayerMove ->
-                    // this callback will be invoked only and only if the current step is proceed without any errors
-                    history = history + BoardHistoryItem(board, playerMove)
-                    switchActivePlayerToNextOne()
+        performPlayerStep(
+            playerMoveInfo = playerMoveInfo,
+            onSuccess = this::finishCurrentStepSuccessfully,
+            onError   = this::notifyCurrentPlayerAboutErrorMove
+        )
+    }
 
-                    board = Board(
-                        turn = board.turn + 1,
-                        activePlayerIndex = activePlayer.index,
-                        figures = desk.mapToFiguresByPlayers()
-                    )
+    private fun finishCurrentStepSuccessfully(playerMove: PlayerMove) {
+        // this callback will be invoked only and only if the current step is proceed without any errors
+        history = history + BoardHistoryItem(board, playerMove)
 
-                    checkIfPreviousStepWinTheGame()
-                    checkIfCurrentPlayerLooseTheGame()
-                    notifyPlayersAboutSuccessMove(playerMove)
-                },
-            onError = { playerMove: PlayerMove? ->
-                    notifyCurrentPlayerAboutErrorMove(playerMove, playerMoveInfo)
-                }
+        val prevPlayer = activePlayer
+
+        switchActivePlayerToNextOne()
+
+        board = Board(
+            turn = board.turn + 1,
+            activePlayerIndex = activePlayer.index,
+            figures = desk.mapToFiguresByPlayers()
         )
 
+        if (gameStatus != GameStatus.FINISHED && checkIfPreviousStepWinTheGame()   ) notifyPlayersAboutWin  (playerMove, prevPlayer)
+        if (gameStatus != GameStatus.FINISHED && checkIfCurrentPlayerLooseTheGame()) notifyPlayersAboutLoose(playerMove, activePlayer)
+        if (gameStatus != GameStatus.FINISHED                                      ) notifyPlayersAboutSuccessMove(playerMove)
+    }
 
+    private fun notifyPlayersAboutLoose(playerMove: PlayerMove, looser: Player) {
+        TODO("Not yet implemented")
+    }
+
+    private fun notifyPlayersAboutWin(playerMove: PlayerMove, winner: Player) {
+        TODO("Not yet implemented")
     }
 
     private fun performPlayerStep(playerMoveInfo: PlayerMoveInfo,
                                   onSuccess: (PlayerMove) -> Unit,
-                                  onError: (PlayerMove?) -> Unit,
+                                  onError: (PlayerMove?, PlayerMoveInfo) -> Unit,
     ) {
         log().debug("performPlayerStep({})", playerMoveInfo)
         //TODO("Not yet implemented")
@@ -175,14 +189,16 @@ class GameActor(
         activePlayerNode = activePlayerNode.next!!
     }
 
-    private fun checkIfCurrentPlayerLooseTheGame() {
+    private fun checkIfCurrentPlayerLooseTheGame(): Boolean {
         log().debug("checkIfCurrentPlayerLooseTheGame()")
         //TODO("Not yet implemented")
+        return false
     }
 
-    private fun checkIfPreviousStepWinTheGame() {
+    private fun checkIfPreviousStepWinTheGame(): Boolean {
         log().debug("checkIfPreviousStepWinTheGame()")
         //TODO("Not yet implemented")
+        return false
     }
 
     private fun notifyPlayersAboutSuccessMove(playerMove: PlayerMove) {
@@ -193,8 +209,7 @@ class GameActor(
     }
 
     private fun notifyCurrentPlayerAboutErrorMove(playerMove: PlayerMove?, playerMoveInfo: PlayerMoveInfo) {
-
-
+        TODO("Not yet implemented")
     }
 
     private fun onWrongPlayerStep(playerMoveInfo: PlayerMoveInfo, wrongPlayerActor: ActorRef) {
