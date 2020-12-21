@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GameMakerService } from 'app/core/game-maker/game-maker.service';
-import { Subscription } from 'rxjs';
+import { Subscription, timer} from 'rxjs';
 import {
     GameInfo,
     ItIsNotYourStepError,
@@ -16,6 +16,11 @@ import {
 } from 'app/core/game-maker/ExternalMessages';
 import { ClassCastException } from 'app/core/game-maker/exceptions';
 import { Board, BoardHistoryItem, Desk, GameHistory, P } from 'app/core/game-maker/GameStateData';
+
+export interface ErrorsListItem {
+    readonly id: number
+    readonly errMsg: ToPlayerMessage
+}
 
 @Component({
     selector: 'jhi-game-page',
@@ -35,10 +40,13 @@ export class GamePageComponent implements OnInit, OnDestroy {
     public board: Board = Board.initialBoard(GamePageComponent.initialDesk);
     public history: GameHistory = [];
 
+    public errors: ErrorsListItem[] = []
+
     public me: PlayerInfo | null = null;
     public opponent: PlayerInfo | null = null;
 
     private gameSubscription?: Subscription;
+    private nextErrId: number = 0;
 
     constructor(private gameMakerService: GameMakerService) {
         console.trace('GamePageComponent.constructor():');
@@ -71,6 +79,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     private onMsg_WrongMoveError(wrongMoveError: WrongMoveError): void {
         console.trace('GamePageComponent.onMsg_WrongMoveError():', wrongMoveError);
+        this.pushToErrors(wrongMoveError)
     }
 
     private onMsg_NextMoveInfo(nextMoveInfo: NextMoveInfo): void {
@@ -105,6 +114,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     private onMsg_ItIsNotYourStepError(itIsNotYourStepError: ItIsNotYourStepError): void {
         console.trace('GamePageComponent.onMsg_ItIsNotYourStepError():', itIsNotYourStepError);
+        this.pushToErrors(itIsNotYourStepError)
 
         // This means - my current state is broken.
         // Probably, due some connection issues and loosing a number of income messages
@@ -114,6 +124,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     private onMsg_WaitingForAGame(waitingForAGame: WaitingForAGame): void {
         console.trace('GamePageComponent.onMsg_WaitingForAGame():', waitingForAGame);
+        this.pushToErrors(waitingForAGame)
     }
 
     startGameRequest(): void {
@@ -131,5 +142,22 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
         const playerMoveInfo = new PlayerMoveInfo(this.board.turn, cellsQueue);
         this.gameMakerService.sendStep(playerMoveInfo);
+    }
+
+    private pushToErrors(toPlayerMessage: ToPlayerMessage) :void {
+        this.nextErrId++
+        const errId = this.nextErrId
+        this.errors.push({
+            id: errId,
+            errMsg: toPlayerMessage
+        })
+
+        timer(5000).subscribe( () => this.eraseFromErrors(errId) )
+    }
+
+    private eraseFromErrors(errId: number): void {
+        const errIndex = this.errors.findIndex( (it) =>  it.id === errId )
+        if (errId === -1) return
+        this.errors.splice(errIndex,1)
     }
 }

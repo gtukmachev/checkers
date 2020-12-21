@@ -1,5 +1,5 @@
 <div class="row">
-    <div class="col-sm-12" align="center">
+    <div class="col-sm-12">
 
         <div class="row">
             <div class="column">
@@ -16,12 +16,7 @@
         </div>
 
         <div class="row">
-
-            <div class="
-                col-xl-5
-                col-lg-7
-                col-md-9
-            ">
+            <div class="col-xl-5 col-lg-7 col-md-9">
                 <div class="row"><div class="col text-center">
                     <jhi-game-board-user-panel *ngIf="opponent"  [player]="opponent!" [activePlayerIndex]="board.activePlayerIndex">
                     </jhi-game-board-user-panel>
@@ -43,16 +38,17 @@
                     </jhi-game-board-user-panel>
                 </div></div>
             </div>
-            <div class="
-                    col-xl-5
-                    col-lg-5
-                    col-md-3
-            ">
+            <div class="col-xl-7 col-lg-5 col-md-3 ">
                 <ul class="list-group">
                     <li *ngFor="let historyItem of history;" class="list-group-item list-group-item-action">
                         <jhi-history-item [historyItem] = "historyItem"></jhi-history-item>
                     </li>
                 </ul>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <jhi-game-error-panel *ngFor="let err of errors" [error]="err"></jhi-game-error-panel>
             </div>
         </div>
     </div>
