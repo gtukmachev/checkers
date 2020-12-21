@@ -56,7 +56,7 @@ export class GamePageComponent implements OnInit, OnDestroy {
 
     private onGameMessage(msg: ToPlayerMessage): void {
         console.trace('GamePageComponent.onGameMessage():', msg);
-        if (msg instanceof WaitingForAGame) this.onMsg_WaitingForAGame(msg);
+             if (msg instanceof WaitingForAGame) this.onMsg_WaitingForAGame(msg);
         else if (msg instanceof ItIsNotYourStepError) this.onMsg_ItIsNotYourStepError(msg);
         else if (msg instanceof NextMoveInfo) this.onMsg_NextMoveInfo(msg);
         else if (msg instanceof WrongMoveError) this.onMsg_WrongMoveError(msg);
